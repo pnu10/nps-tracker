@@ -762,11 +762,13 @@ function renderChanges() {
             <div class="chg-stock-name">${info.d}</div>
             <div class="chg-stock-ticker">${info.t ? info.t+' · ' : ''}${info.m}</div>
           </div>
-          <span class="chg-sum-badge ${t.badgeClass}">${t.label}</span>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+            <span class="chg-sum-badge ${t.badgeClass}">${t.label}</span>
+            <span style="font-size:10px;color:#C9CDD2;font-weight:600">탭하면 상세 보기 →</span>
+          </div>
         </div>
         <div class="chg-item-desc">${t.desc(h)}</div>
         ${stats}
-        <div style="font-size:10px;color:#C9CDD2;margin-top:6px;font-weight:600">탭하면 상세 보기 →</div>
       </div>`;
   }).join('');
 }
