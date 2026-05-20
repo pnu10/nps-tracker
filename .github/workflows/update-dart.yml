@@ -1,0 +1,35 @@
+name: Update DART Holdings
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # 매일 00:00 UTC = 09:00 KST
+  workflow_dispatch:      # 수동 실행 버튼
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch DART holdings
+        env:
+          DART_API_KEY: ${{ secrets.DART_API_KEY }}
+        run: node fetch-dart-local.mjs > kr_holdings.json
+
+      - name: Upload to Cloudflare KV
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          KV_NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
+        run: |
+          curl -sf -X PUT \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/storage/kv/namespaces/${KV_NAMESPACE_ID}/values/kr_holdings" \
+            -H "Authorization: Bearer ${CF_API_TOKEN}" \
+            -H "Content-Type: application/json" \
+            --data-binary @kr_holdings.json
+          echo "KV 업로드 완료"

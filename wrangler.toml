@@ -1,0 +1,15 @@
+name = "nps-tracker"
+main = "worker/index.js"
+compatibility_date = "2024-01-01"
+
+# KV 네임스페이스 — 배포 후 아래 id 채우기
+[[kv_namespaces]]
+binding = "KV"
+id = "5702d3b8c85245f5ac8083ae07da3b34"
+
+# 매일 00:00 UTC (오전 9시 KST) 자동 갱신
+[triggers]
+crons = ["0 0 * * *"]
+
+# DART API 키는 배포 후 secret으로 등록
+# npx wrangler secret put DART_API_KEY

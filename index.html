@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>국민연금 뭐샀지</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI', sans-serif; background: #F2F4F6; color: #191F28; min-height: 100vh; }
+
+/* ── 헤더 ────────────────────────────────── */
+.header { background: #fff; padding: 20px 20px 14px; display: flex; justify-content: space-between; align-items: flex-end; }
+.header-title { font-size: 24px; font-weight: 800; color: #191F28; letter-spacing: -0.5px; }
+.header-sub { font-size: 12px; color: #6B7280; margin-top: 3px; font-weight: 500; }
+.header-share { background: #F2F4F6; border: none; border-radius: 20px; padding: 8px 14px; font-size: 13px; font-weight: 700; color: #4E5968; cursor: pointer; transition: background 0.12s; flex-shrink: 0; }
+.header-share:active { background: #E8EAED; }
+
+/* ── 탭바 (pill 스타일) ───────────────────── */
+.tab-bar { display: flex; gap: 4px; padding: 8px 8px; background: #F2F4F6; position: sticky; top: 0; z-index: 10; }
+.tab { flex: 1; padding: 8px 4px 7px; border: none; background: transparent; border-radius: 10px; cursor: pointer; transition: all 0.15s; text-align: center; }
+.tab.active { background: #fff; box-shadow: 0 1px 6px rgba(0,0,0,0.08), 0 0 1px rgba(0,0,0,0.04); }
+.tab-label { display: block; font-size: 13px; font-weight: 700; color: #ADB5BD; letter-spacing: -0.2px; }
+.tab.active .tab-label { color: #191F28; }
+.tab-sub { display: block; font-size: 10px; color: #C9CDD2; margin-top: 1px; font-weight: 500; }
+.tab.active .tab-sub { color: #8B95A1; }
+
+/* ── 탭 콘텐츠 전환 ──────────────────────── */
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeUp 0.16s ease; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── Hero ────────────────────────────────── */
+.hero-card { margin: 10px 12px 8px; background: #191F28; border-radius: 16px; padding: 18px 20px 16px; }
+.hero-eyebrow { font-size: 11px; color: rgba(255,255,255,0.4); font-weight: 600; margin-bottom: 6px; }
+.hero-value { font-size: 34px; font-weight: 800; color: #fff; letter-spacing: -1.5px; line-height: 1; }
+.hero-label { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 3px; }
+.hero-stats { display: flex; gap: 6px; margin-top: 12px; }
+.hero-stat { flex: 1; background: rgba(255,255,255,0.08); border-radius: 8px; padding: 9px 10px; }
+.hero-stat-val { font-size: 14px; font-weight: 800; color: #fff; letter-spacing: -0.3px; }
+.hero-stat-label { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 2px; font-weight: 500; }
+
+/* ── 환율 배너 ───────────────────────────── */
+.rate-banner { margin: 0 12px 8px; background: #fff; border-radius: 12px; padding: 11px 14px; display: flex; justify-content: space-between; align-items: center; }
+.rate-left { display: flex; align-items: center; gap: 7px; }
+.rate-dot { width: 6px; height: 6px; border-radius: 50%; background: #0BB25F; flex-shrink: 0; }
+.rate-dot.loading { background: #ADB5BD; }
+.rate-currency { font-size: 11px; color: #ADB5BD; font-weight: 600; }
+.rate-value { font-size: 15px; font-weight: 800; color: #191F28; letter-spacing: -0.3px; }
+.rate-date { font-size: 11px; color: #ADB5BD; }
+
+/* ── KPI 그리드 ──────────────────────────── */
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 0 12px; margin-bottom: 8px; }
+.stat-card { background: #fff; border-radius: 10px; padding: 11px 14px; }
+.stat-label { font-size: 11px; color: #ADB5BD; font-weight: 600; margin-bottom: 3px; }
+.stat-value { font-size: 20px; font-weight: 800; color: #191F28; letter-spacing: -0.5px; }
+.stat-sub { font-size: 10px; color: #0BB25F; font-weight: 600; margin-top: 2px; }
+.stat-sub.red { color: #DC2626; }
+
+/* ── 섹션 타이틀 ─────────────────────────── */
+.section-title { font-size: 11px; font-weight: 700; color: #ADB5BD; padding: 0 12px; margin: 10px 0 6px; letter-spacing: 0.3px; }
+
+/* ── 변화 요약 (홈) ──────────────────────── */
+.chg-summary { margin: 0 12px 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.chg-sum-card { background: #fff; border-radius: 10px; padding: 11px 12px; cursor: pointer; transition: transform 0.1s, opacity 0.1s; }
+.chg-sum-card:active { transform: scale(0.97); opacity: 0.9; }
+.chg-sum-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; display: inline-block; margin-bottom: 6px; }
+.chg-sum-item { font-size: 13px; font-weight: 700; color: #191F28; margin-bottom: 2px; line-height: 1.3; }
+.chg-sum-more { font-size: 10px; color: #ADB5BD; margin-top: 4px; }
+
+/* ── 보유 리스트 (홈) ────────────────────── */
+.holding-list { background: #fff; border-radius: 12px; margin: 0 12px 8px; overflow: hidden; }
+.holding-row { display: flex; align-items: center; padding: 11px 14px; border-bottom: 1px solid #F8F9FA; cursor: pointer; transition: background 0.1s; }
+.holding-row:last-child { border-bottom: none; }
+.holding-row:active { background: #F8F9FA; }
+.holding-rank { font-size: 12px; color: #C9CDD2; font-weight: 700; width: 18px; flex-shrink: 0; }
+.holding-info { flex: 1; padding: 0 10px; }
+.holding-name { font-size: 14px; font-weight: 700; color: #191F28; }
+.holding-ticker { font-size: 11px; color: #ADB5BD; margin-top: 1px; }
+.holding-right { text-align: right; }
+.holding-pct { font-size: 14px; font-weight: 800; color: #191F28; }
+.holding-krw { font-size: 11px; color: #ADB5BD; margin-top: 1px; }
+
+/* ── 많이 늘린 종목 (홈) ─────────────────── */
+.gain-list { display: flex; flex-direction: column; gap: 6px; padding: 0 12px; margin-bottom: 10px; }
+.gain-card { background: #fff; border-radius: 10px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: transform 0.1s, opacity 0.1s; }
+.gain-card:active { transform: scale(0.98); opacity: 0.92; }
+.gain-name { font-size: 14px; font-weight: 700; color: #191F28; }
+.gain-sub { font-size: 11px; color: #ADB5BD; margin-top: 1px; }
+.gain-pct { font-size: 17px; font-weight: 800; color: #0BB25F; letter-spacing: -0.5px; }
+.gain-pct.purple { color: #6D28D9; }
+
+/* ── 배지 ────────────────────────────────── */
+.badge-new  { background: #DCFCE7; color: #15803D; }
+.badge-inc  { background: #DBEAFE; color: #1E40AF; }
+.badge-dec  { background: #FFF7ED; color: #9A3412; }
+.badge-sold { background: #FEE2E2; color: #DC2626; }
+.badge-hold { background: #F2F4F6; color: #4E5968; }
+
+/* ── 필터 행 ─────────────────────────────── */
+.filter-row { display: flex; gap: 6px; padding: 10px 12px 0; overflow-x: auto; scrollbar-width: none; margin-bottom: 8px; }
+.filter-row::-webkit-scrollbar { display: none; }
+.filter-btn { font-size: 13px; padding: 6px 13px; border-radius: 20px; border: 1.5px solid #E8EAED; background: #fff; color: #4E5968; cursor: pointer; white-space: nowrap; font-weight: 600; transition: all 0.12s; }
+.filter-btn.active { background: #191F28; color: #fff; border-color: #191F28; box-shadow: 0 2px 6px rgba(25,31,40,0.18); }
+
+/* ── 변화 탭 카드 ────────────────────────── */
+.chg-item { background: #fff; border-radius: 10px; padding: 13px 14px; margin: 0 12px 6px; cursor: pointer; transition: transform 0.1s, opacity 0.1s; }
+.chg-item:active { transform: scale(0.985); opacity: 0.92; }
+.chg-item-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px; }
+.chg-stock-name { font-size: 15px; font-weight: 800; color: #191F28; letter-spacing: -0.3px; }
+.chg-stock-ticker { font-size: 11px; color: #ADB5BD; margin-top: 1px; font-weight: 600; }
+.chg-item-desc { font-size: 12px; color: #6B7280; line-height: 1.4; }
+.chg-item-stats { display: flex; gap: 6px; margin-top: 9px; }
+.chg-stat { background: #F8F9FA; border-radius: 7px; padding: 6px 9px; }
+.chg-stat-val { font-size: 13px; font-weight: 800; color: #191F28; }
+.chg-stat-label { font-size: 10px; color: #ADB5BD; margin-top: 1px; font-weight: 600; }
+
+/* ── 포트폴리오 탭 ───────────────────────── */
+.sort-row { display: flex; gap: 6px; padding: 10px 12px 8px; }
+.sort-btn { font-size: 12px; padding: 6px 12px; border-radius: 20px; border: 1.5px solid #E8EAED; background: #fff; color: #4E5968; cursor: pointer; font-weight: 600; transition: all 0.12s; }
+.sort-btn.active { background: #191F28; color: #fff; border-color: #191F28; }
+
+.portfolio-list { background: #fff; border-radius: 12px; margin: 0 12px 10px; overflow: hidden; }
+.port-row { display: flex; align-items: center; padding: 11px 14px; border-bottom: 1px solid #F8F9FA; cursor: pointer; transition: background 0.1s; }
+.port-row:last-child { border-bottom: none; }
+.port-row:active { background: #F8F9FA; }
+.port-rank { font-size: 12px; color: #D1D5DB; font-weight: 700; width: 22px; flex-shrink: 0; }
+.port-icon { width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0; margin-right: 10px; }
+.port-info { flex: 1; }
+.port-name { font-size: 14px; font-weight: 700; color: #191F28; }
+.port-ticker { font-size: 11px; color: #ADB5BD; margin-top: 1px; }
+.port-right { text-align: right; }
+.port-pct { font-size: 14px; font-weight: 800; color: #191F28; }
+.port-krw { font-size: 11px; color: #ADB5BD; margin-top: 1px; }
+.port-chg { font-size: 11px; font-weight: 700; margin-top: 2px; }
+.port-chg.up { color: #0BB25F; }
+.port-chg.dn { color: #DC2626; }
+.port-chg.new { color: #6D28D9; }
+
+/* ── 섹터 탭 ─────────────────────────────── */
+.sector-list { padding: 0 12px; display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+.sector-card { background: #fff; border-radius: 12px; padding: 14px 16px; cursor: pointer; transition: transform 0.1s, opacity 0.1s; }
+.sector-card:active { transform: scale(0.98); opacity: 0.92; }
+.sector-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.sector-icon-wrap { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.sector-name { font-size: 15px; font-weight: 800; color: #191F28; margin-top: 2px; }
+.sector-right { text-align: right; }
+.sector-pct { font-size: 22px; font-weight: 800; color: #191F28; letter-spacing: -0.5px; }
+.sector-pct-label { font-size: 10px; color: #ADB5BD; margin-top: 1px; }
+.sector-bar-bg { height: 6px; background: #F2F4F6; border-radius: 3px; overflow: hidden; margin-bottom: 10px; }
+.sector-bar { height: 6px; border-radius: 3px; background: #191F28; }
+.sector-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.sector-chip { font-size: 12px; padding: 4px 10px; border-radius: 20px; font-weight: 600; background: #F2F4F6; color: #4E5968; }
+
+/* ── 바텀시트 ────────────────────────────── */
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; display: none; }
+.sheet { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-radius: 22px 22px 0 0; max-height: 86vh; overflow-y: auto; z-index: 101; transform: translateY(100%); transition: transform 0.28s cubic-bezier(0.32,0.72,0,1); padding-bottom: 36px; }
+.sheet.open { transform: translateY(0); }
+.sh-handle { width: 36px; height: 4px; background: #E8EAED; border-radius: 2px; margin: 12px auto 10px; }
+
+/* sticky summary */
+.sh-sticky { padding: 0 20px 14px; border-bottom: 1px solid #F2F4F6; }
+.sh-name { font-size: 17px; font-weight: 800; letter-spacing: -0.3px; }
+.sh-summary-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+.sh-summary-val { font-size: 13px; font-weight: 700; color: #4E5968; }
+.sh-summary-sep { color: #D1D5DB; font-size: 12px; }
+.sh-badge { border-radius: 20px; padding: 4px 10px; font-size: 11px; font-weight: 700; border: none; }
+.sh-share-btn { background: #F2F4F6; border: none; border-radius: 20px; padding: 6px 12px; font-size: 12px; font-weight: 700; color: #4E5968; cursor: pointer; margin-left: auto; flex-shrink: 0; }
+
+.sh-section { padding: 14px 20px; border-bottom: 1px solid #F8F9FA; }
+.sh-section:last-child { border-bottom: none; }
+.sh-section-title { font-size: 10px; font-weight: 700; color: #ADB5BD; margin-bottom: 10px; letter-spacing: 0.5px; text-transform: uppercase; }
+.sh-stat-row { display: flex; gap: 7px; }
+.sh-stat { flex: 1; background: #F8F9FA; border-radius: 9px; padding: 11px 12px; }
+.sh-stat-val { font-size: 16px; font-weight: 800; color: #191F28; letter-spacing: -0.5px; }
+.sh-stat-label { font-size: 10px; color: #ADB5BD; font-weight: 600; margin-top: 2px; }
+
+.sh-change-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid #F8F9FA; }
+.sh-change-row:last-child { border-bottom: none; }
+.sh-change-label { font-size: 13px; color: #4E5968; font-weight: 600; }
+.sh-change-val { font-size: 13px; font-weight: 800; }
+
+.co-held-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+.co-chip { font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 20px; cursor: pointer; }
+
+/* ── 공유 ─────────────────────────────────── */
+.toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #191F28; color: #fff; padding: 10px 20px; border-radius: 22px; font-size: 13px; font-weight: 600; z-index: 200; opacity: 0; transition: opacity 0.18s; pointer-events: none; white-space: nowrap; }
+.toast.show { opacity: 1; }
+
+/* ── 공통보유 추세 ───────────────────────── */
+.trend-header { display: flex; justify-content: flex-end; gap: 14px; margin-bottom: 6px; padding-right: 2px; }
+.trend-q-label { font-size: 10px; font-weight: 700; color: #C9CDD2; width: 8px; text-align: center; }
+.trend-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #F8F9FA; }
+.trend-row:last-child { border-bottom: none; }
+.trend-name { font-size: 13px; font-weight: 700; color: #191F28; }
+.trend-dots { display: flex; gap: 14px; align-items: center; padding-right: 2px; }
+.trend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.trend-dot.on  { background: #191F28; }
+.trend-dot.off { background: #E8EAED; }
+
+/* ── 공통 ─────────────────────────────────── */
+.disclaimer { margin: 2px 12px 28px; background: #fff; border-radius: 10px; padding: 11px 14px; }
+.disclaimer p { font-size: 11px; color: #ADB5BD; line-height: 1.7; font-weight: 500; }
+.disclaimer strong { font-weight: 700; color: #8B95A1; }
+.empty-state { text-align: center; padding: 48px 16px; color: #ADB5BD; font-size: 14px; }
+</style>
+</head>
+<body>
+
+<!-- 헤더 -->
+<div class="header">
+  <div>
+    <div class="header-title">국민연금 뭐샀지</div>
+    <div class="header-sub">국민연금 공시 기반 포트폴리오 탐색</div>
+  </div>
+  <button class="header-share" onclick="shareApp()">공유 🔗</button>
+</div>
+
+<!-- 탭바 -->
+<div class="tab-bar">
+  <button class="tab active" onclick="switchTab('home')">
+    <span class="tab-label">홈</span>
+    <span class="tab-sub">전체 흐름</span>
+  </button>
+  <button class="tab" onclick="switchTab('changes')">
+    <span class="tab-label">변화</span>
+    <span class="tab-sub">직전 분기 비교</span>
+  </button>
+  <button class="tab" onclick="switchTab('portfolio')">
+    <span class="tab-label">포트폴리오</span>
+    <span class="tab-sub">현재 보유</span>
+  </button>
+  <button class="tab" onclick="switchTab('sector')">
+    <span class="tab-label">섹터</span>
+    <span class="tab-sub">업종 비중</span>
+  </button>
+</div>
+
+<!-- 홈 탭 -->
+<div id="tab-home" class="tab-content active">
+  <div class="hero-card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+      <div class="hero-eyebrow" style="margin-bottom:0">국민연금공단 공시 기준</div>
+      <div style="background:rgba(255,255,255,0.12);border-radius:8px;padding:4px 9px;font-size:11px;font-weight:700;color:rgba(255,255,255,0.75);white-space:nowrap">2025 Q4 → 2026 Q1</div>
+    </div>
+    <div class="hero-value">182조원</div>
+    <div class="hero-label">국내외 주식 보유 총액</div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-val">561개</div>
+        <div class="hero-stat-label">보유 종목</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-val">국내 45%</div>
+        <div class="hero-stat-label">국내 비중</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-val">미국 38%</div>
+        <div class="hero-stat-label">미국 비중</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 환율 -->
+  <div class="rate-banner">
+    <div class="rate-left">
+      <div class="rate-dot loading" id="rate-dot"></div>
+      <div>
+        <div class="rate-currency">USD / KRW</div>
+        <div class="rate-value" id="rate-value">조회 중...</div>
+      </div>
+    </div>
+    <div class="rate-date" id="rate-date"></div>
+  </div>
+
+  <!-- KPI -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">신규 편입</div>
+      <div class="stat-value">8개</div>
+      <div class="stat-sub">전분기 대비</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">청산 종목</div>
+      <div class="stat-value">5개</div>
+      <div class="stat-sub red">전량 매도</div>
+    </div>
+  </div>
+
+  <!-- 이번 분기 변화 -->
+  <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0 12px;margin:10px 0 6px">
+    <div class="section-title" style="padding:0;margin:0">이번 분기 변화</div>
+    <div style="font-size:11px;font-weight:700;color:#ADB5BD">직전 분기 대비</div>
+  </div>
+  <div class="chg-summary">
+    <div class="chg-sum-card" onclick="switchTab('changes');setChgFilter('NEW',document.querySelector('[data-filter=NEW]'))">
+      <span class="chg-sum-badge badge-new">신규 편입</span>
+      <div class="chg-sum-item">알테오젠</div>
+      <div class="chg-sum-item">AppLovin</div>
+      <div class="chg-sum-more">+6개 →</div>
+    </div>
+    <div class="chg-sum-card" onclick="switchTab('changes');setChgFilter('INCREASED',document.querySelector('[data-filter=INCREASED]'))">
+      <span class="chg-sum-badge badge-inc">비중 확대</span>
+      <div class="chg-sum-item">엔비디아</div>
+      <div class="chg-sum-item">한화에어로</div>
+      <div class="chg-sum-more">+12개 →</div>
+    </div>
+    <div class="chg-sum-card" onclick="switchTab('changes');setChgFilter('DECREASED',document.querySelector('[data-filter=DECREASED]'))">
+      <span class="chg-sum-badge badge-dec">비중 축소</span>
+      <div class="chg-sum-item">애플</div>
+      <div class="chg-sum-item">삼성바이오</div>
+      <div class="chg-sum-more">+9개 →</div>
+    </div>
+    <div class="chg-sum-card" onclick="switchTab('changes');setChgFilter('SOLD',document.querySelector('[data-filter=SOLD]'))">
+      <span class="chg-sum-badge badge-sold">청산</span>
+      <div class="chg-sum-item">기아</div>
+      <div class="chg-sum-item">Pinterest</div>
+      <div class="chg-sum-more">+3개 →</div>
+    </div>
+  </div>
+
+  <!-- TOP 5 보유 -->
+  <div class="section-title">가장 많이 보유한 종목</div>
+  <div class="holding-list">
+    <div class="holding-row" onclick="openStockSheet('삼성전자','005930',2.85,82000000000000,'HOLD',0,'반도체')">
+      <div class="holding-rank">1</div>
+      <div class="holding-info"><div class="holding-name">삼성전자</div><div class="holding-ticker">005930 · 코스피</div></div>
+      <div class="holding-right"><div class="holding-pct">2.85%</div><div class="holding-krw">82.0조원</div></div>
+    </div>
+    <div class="holding-row" onclick="openStockSheet('애플','AAPL',1.42,40900000000000,'DECREASED',-8.2,'빅테크')">
+      <div class="holding-rank">2</div>
+      <div class="holding-info"><div class="holding-name">애플</div><div class="holding-ticker">AAPL · 나스닥</div></div>
+      <div class="holding-right"><div class="holding-pct">1.42%</div><div class="holding-krw">40.9조원</div></div>
+    </div>
+    <div class="holding-row" onclick="openStockSheet('엔비디아','NVDA',1.18,34000000000000,'INCREASED',18.3,'반도체')">
+      <div class="holding-rank">3</div>
+      <div class="holding-info"><div class="holding-name">엔비디아</div><div class="holding-ticker">NVDA · 나스닥</div></div>
+      <div class="holding-right"><div class="holding-pct">1.18%</div><div class="holding-krw">34.0조원</div></div>
+    </div>
+    <div class="holding-row" onclick="openStockSheet('마이크로소프트','MSFT',0.98,28200000000000,'HOLD',0,'빅테크')">
+      <div class="holding-rank">4</div>
+      <div class="holding-info"><div class="holding-name">마이크로소프트</div><div class="holding-ticker">MSFT · 나스닥</div></div>
+      <div class="holding-right"><div class="holding-pct">0.98%</div><div class="holding-krw">28.2조원</div></div>
+    </div>
+    <div class="holding-row" onclick="openStockSheet('아마존','AMZN',0.76,21900000000000,'INCREASED',6.1,'빅테크')">
+      <div class="holding-rank">5</div>
+      <div class="holding-info"><div class="holding-name">아마존</div><div class="holding-ticker">AMZN · 나스닥</div></div>
+      <div class="holding-right"><div class="holding-pct">0.76%</div><div class="holding-krw">21.9조원</div></div>
+    </div>
+  </div>
+
+  <!-- 많이 늘린 종목 -->
+  <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0 12px;margin:10px 0 6px">
+    <div class="section-title" style="padding:0;margin:0">많이 늘린 종목</div>
+    <div style="font-size:11px;font-weight:700;color:#ADB5BD">직전 분기 대비</div>
+  </div>
+  <div class="gain-list">
+    <div class="gain-card" onclick="openStockSheet('엔비디아','NVDA',1.18,34000000000000,'INCREASED',18.3,'반도체')">
+      <div><div class="gain-name">엔비디아 (NVDA)</div><div class="gain-sub">반도체 · 비중 확대</div></div>
+      <div><div class="gain-pct">+18.3%</div><div style="font-size:10px;color:#ADB5BD;text-align:right;margin-top:2px;font-weight:600">vs 직전 분기</div></div>
+    </div>
+    <div class="gain-card" onclick="openStockSheet('한화에어로스페이스','012450',0.31,8900000000000,'INCREASED',14.1,'방산')">
+      <div><div class="gain-name">한화에어로스페이스</div><div class="gain-sub">방산 · 비중 확대</div></div>
+      <div><div class="gain-pct">+14.1%</div><div style="font-size:10px;color:#ADB5BD;text-align:right;margin-top:2px;font-weight:600">vs 직전 분기</div></div>
+    </div>
+    <div class="gain-card" onclick="openStockSheet('메타','META',0.52,15000000000000,'INCREASED',12.0,'빅테크')">
+      <div><div class="gain-name">메타 (META)</div><div class="gain-sub">빅테크 · 비중 확대</div></div>
+      <div><div class="gain-pct">+12.0%</div><div style="font-size:10px;color:#ADB5BD;text-align:right;margin-top:2px;font-weight:600">vs 직전 분기</div></div>
+    </div>
+    <div class="gain-card" onclick="openStockSheet('알테오젠','196170',0.08,2300000000000,'NEW',0,'바이오')">
+      <div><div class="gain-name">알테오젠</div><div class="gain-sub">바이오 · 직전 분기에 없던 종목</div></div>
+      <div class="gain-pct purple">NEW</div>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <p>🇺🇸 미국은 SEC 13F 전종목 · 🇰🇷 국내는 DART 대량보유 공시 기준 <strong>5% 이상 종목만</strong> 표시 · 직전 분기와 비교</p>
+  </div>
+</div>
+
+<!-- 변화 탭 -->
+<div id="tab-changes" class="tab-content">
+  <div style="margin:10px 12px 0;background:#F8F9FA;border-radius:10px;padding:9px 14px;display:flex;justify-content:space-between;align-items:center">
+    <span style="font-size:12px;font-weight:700;color:#4E5968">직전 분기 대비 변화</span>
+    <span style="font-size:11px;font-weight:700;color:#ADB5BD">2025 Q4 → 2026 Q1</span>
+  </div>
+  <div class="filter-row">
+    <button class="filter-btn active" data-filter="all"       onclick="setChgFilter('all',this)">전체</button>
+    <button class="filter-btn"        data-filter="NEW"       onclick="setChgFilter('NEW',this)">🟢 신규</button>
+    <button class="filter-btn"        data-filter="INCREASED" onclick="setChgFilter('INCREASED',this)">🔼 확대</button>
+    <button class="filter-btn"        data-filter="DECREASED" onclick="setChgFilter('DECREASED',this)">🔽 축소</button>
+    <button class="filter-btn"        data-filter="SOLD"      onclick="setChgFilter('SOLD',this)">🔴 청산</button>
+  </div>
+  <div id="changes-list"></div>
+  <div class="disclaimer"><p>🇺🇸 SEC 13F 전종목 · 🇰🇷 DART 대량보유 공시 <strong>5% 이상</strong> · 직전 분기와 비교</p></div>
+</div>
+
+<!-- 포트폴리오 탭 -->
+<div id="tab-portfolio" class="tab-content">
+  <div style="margin:10px 12px 0;background:#F8F9FA;border-radius:10px;padding:9px 14px;display:flex;justify-content:space-between;align-items:center">
+    <span style="font-size:12px;font-weight:700;color:#4E5968">현재 보유 현황</span>
+    <span style="font-size:11px;font-weight:700;color:#ADB5BD">2026 Q1 공시 기준</span>
+  </div>
+  <div class="sort-row">
+    <button class="sort-btn active" onclick="setSortFilter('weight',this)">비중순</button>
+    <button class="sort-btn" onclick="setSortFilter('amount',this)">금액순</button>
+    <button class="sort-btn" onclick="setSortFilter('change',this)">변화순</button>
+  </div>
+  <div class="portfolio-list" id="portfolio-list"></div>
+  <div class="disclaimer"><p>🇺🇸 SEC 13F 전종목 · 🇰🇷 DART <strong>5% 이상</strong> · 상위 50개 표시 · 직전 분기와 비교</p></div>
+</div>
+
+<!-- 섹터 탭 -->
+<div id="tab-sector" class="tab-content">
+  <div class="section-title" style="margin-top:10px">섹터별 보유 비중</div>
+  <div class="sector-list" id="sector-list"></div>
+  <div class="disclaimer"><p>섹터 분류는 참고용이며 실제 공시 기준과 다를 수 있습니다.</p></div>
+</div>
+
+<!-- 바텀시트 -->
+<div class="overlay" id="overlay" onclick="closeSheet()"></div>
+<div class="sheet" id="stock-sheet">
+  <div class="sh-handle"></div>
+  <div class="sh-sticky">
+    <div class="sh-name" id="sh-name">-</div>
+    <div class="sh-summary-row">
+      <span class="sh-summary-val" id="sh-weight">-</span>
+      <span class="sh-summary-sep">·</span>
+      <span class="sh-summary-val" id="sh-krw">-</span>
+      <span id="sh-badge" class="sh-badge"></span>
+      <button class="sh-share-btn" onclick="shareStock()">공유 🔗</button>
+    </div>
+  </div>
+  <div id="sh-content"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── 환율 ──────────────────────────────────────────────────────────
+const API_BASE = "https://nps-tracker.pnut102142.workers.dev";
+
+async function loadRate() {
+  try {
+    const res = await fetch(`${API_BASE}/api/exchange-rate`);
+    const d   = await res.json();
+    document.getElementById('rate-value').textContent = `${Math.round(d.rate).toLocaleString()}원`;
+    document.getElementById('rate-date').textContent  = `${d.date} 기준`;
+    document.getElementById('rate-dot').classList.remove('loading');
+  } catch {
+    document.getElementById('rate-value').textContent = '조회 실패';
+  }
+}
+
+// ── 데이터 ────────────────────────────────────────────────────────
+// coHeld trend: [Q3 2025, Q4 2025, Q1 2026]
+const CHANGES_DATA = [
+  { name:"알테오젠",          ticker:"196170", market:"코스피", type:"NEW",       changePct:0,     weight:0.08, krw:2300000000000,  sector:"바이오",
+    coHeld:[
+      { name:"삼성바이오로직스", trend:[true,  true,  true]  },
+      { name:"셀트리온",         trend:[false, true,  true]  },
+      { name:"리제네론",         trend:[true,  true,  true]  },
+    ]},
+  { name:"AppLovin",          ticker:"APP",    market:"나스닥", type:"NEW",       changePct:0,     weight:0.06, krw:1700000000000,  sector:"AI/테크",
+    coHeld:[
+      { name:"엔비디아",   trend:[true,  true,  true]  },
+      { name:"팔란티어",   trend:[false, false, true]  },
+      { name:"브로드컴",   trend:[true,  true,  true]  },
+    ]},
+  { name:"Reddit",            ticker:"RDDT",   market:"뉴욕",   type:"NEW",       changePct:0,     weight:0.04, krw:1100000000000,  sector:"소셜미디어",
+    coHeld:[
+      { name:"메타",   trend:[true,  true,  true]  },
+      { name:"알파벳", trend:[true,  true,  true]  },
+    ]},
+  { name:"HD현대마린솔루션",   ticker:"443060", market:"코스피", type:"NEW",       changePct:0,     weight:0.03, krw:860000000000,   sector:"조선/해운",
+    coHeld:[
+      { name:"HD현대중공업", trend:[true, true,  true]  },
+      { name:"삼성중공업",   trend:[true, false, true]  },
+    ]},
+  { name:"엔비디아",           ticker:"NVDA",   market:"나스닥", type:"INCREASED", changePct:18.3,  weight:1.18, krw:34000000000000, sector:"반도체",
+    coHeld:[
+      { name:"TSMC",   trend:[true,  true,  true]  },
+      { name:"AMD",    trend:[false, true,  true]  },
+      { name:"브로드컴", trend:[true, true,  true]  },
+    ]},
+  { name:"한화에어로스페이스",  ticker:"012450", market:"코스피", type:"INCREASED", changePct:14.1,  weight:0.31, krw:8900000000000,  sector:"방산",
+    coHeld:[
+      { name:"LIG넥스원", trend:[true, true,  true]  },
+      { name:"현대로템",   trend:[true, true,  true]  },
+      { name:"RTX",       trend:[true, false, true]  },
+    ]},
+  { name:"메타",               ticker:"META",   market:"나스닥", type:"INCREASED", changePct:12.0,  weight:0.52, krw:15000000000000, sector:"빅테크",
+    coHeld:[
+      { name:"알파벳", trend:[true, true, true]  },
+      { name:"아마존", trend:[true, true, true]  },
+    ]},
+  { name:"팔란티어",           ticker:"PLTR",   market:"나스닥", type:"INCREASED", changePct:9.4,   weight:0.14, krw:4000000000000,  sector:"AI/테크",
+    coHeld:[
+      { name:"엔비디아",  trend:[true,  true,  true]  },
+      { name:"AppLovin", trend:[false, false, true]  },
+      { name:"데이터독",  trend:[true,  true,  false] },
+    ]},
+  { name:"현대건설",           ticker:"000720", market:"코스피", type:"INCREASED", changePct:7.8,   weight:0.11, krw:3200000000000,  sector:"건설",
+    coHeld:[
+      { name:"GS건설",  trend:[true, true, true]  },
+      { name:"삼성물산", trend:[true, true, true]  },
+    ]},
+  { name:"아마존",             ticker:"AMZN",   market:"나스닥", type:"INCREASED", changePct:6.1,   weight:0.76, krw:21900000000000, sector:"빅테크",
+    coHeld:[
+      { name:"마이크로소프트", trend:[true, true, true]  },
+      { name:"메타",           trend:[true, true, true]  },
+      { name:"구글",           trend:[true, true, true]  },
+    ]},
+  { name:"애플",               ticker:"AAPL",   market:"나스닥", type:"DECREASED", changePct:-8.2,  weight:1.42, krw:40900000000000, sector:"빅테크",
+    coHeld:[
+      { name:"마이크로소프트", trend:[true, true,  true]  },
+      { name:"아마존",         trend:[true, true,  true]  },
+      { name:"구글",           trend:[true, false, true]  },
+    ]},
+  { name:"삼성바이오로직스",    ticker:"207940", market:"코스피", type:"DECREASED", changePct:-11.3, weight:0.24, krw:6900000000000,  sector:"바이오",
+    coHeld:[
+      { name:"셀트리온",  trend:[true, true, true]  },
+      { name:"한미약품",  trend:[true, true, true]  },
+      { name:"유한양행",  trend:[true, true, false] },
+    ]},
+  { name:"POSCO홀딩스",        ticker:"005490", market:"코스피", type:"DECREASED", changePct:-6.5,  weight:0.18, krw:5200000000000,  sector:"소재",
+    coHeld:[
+      { name:"현대제철", trend:[true, true, true]  },
+      { name:"고려아연",  trend:[true, true, true]  },
+    ]},
+  { name:"인텔",               ticker:"INTC",   market:"나스닥", type:"DECREASED", changePct:-15.2, weight:0.09, krw:2600000000000,  sector:"반도체",
+    coHeld:[
+      { name:"AMD",    trend:[true, true,  true]  },
+      { name:"퀄컴",   trend:[true, true,  false] },
+      { name:"마이크론", trend:[true, false, true] },
+    ]},
+  { name:"기아",               ticker:"000270", market:"코스피", type:"SOLD",      changePct:-100,  weight:0,    krw:0,              sector:"자동차",    coHeld:[] },
+  { name:"Pinterest",          ticker:"PINS",   market:"뉴욕",   type:"SOLD",      changePct:-100,  weight:0,    krw:0,              sector:"소셜미디어", coHeld:[] },
+  { name:"화이자",             ticker:"PFE",    market:"뉴욕",   type:"SOLD",      changePct:-100,  weight:0,    krw:0,              sector:"바이오",    coHeld:[] },
+];
+
+const PORTFOLIO_DATA = [
+  { name:"삼성전자",          ticker:"005930", market:"코스피", weight:2.85, krw:82000000000000,  type:"HOLD",      changePct:0,     sector:"반도체",    color:"#DCFCE7", tc:"#15803D" },
+  { name:"애플",              ticker:"AAPL",   market:"나스닥", weight:1.42, krw:40900000000000,  type:"DECREASED", changePct:-8.2,  sector:"빅테크",    color:"#FFF7ED", tc:"#9A3412" },
+  { name:"엔비디아",          ticker:"NVDA",   market:"나스닥", weight:1.18, krw:34000000000000,  type:"INCREASED", changePct:18.3,  sector:"반도체",    color:"#DBEAFE", tc:"#1E40AF" },
+  { name:"마이크로소프트",     ticker:"MSFT",   market:"나스닥", weight:0.98, krw:28200000000000,  type:"HOLD",      changePct:0,     sector:"빅테크",    color:"#F8F9FA", tc:"#6B7280" },
+  { name:"아마존",            ticker:"AMZN",   market:"나스닥", weight:0.76, krw:21900000000000,  type:"INCREASED", changePct:6.1,   sector:"빅테크",    color:"#DBEAFE", tc:"#1E40AF" },
+  { name:"SK하이닉스",        ticker:"000660", market:"코스피", weight:0.68, krw:19600000000000,  type:"HOLD",      changePct:0,     sector:"반도체",    color:"#F8F9FA", tc:"#6B7280" },
+  { name:"알파벳",            ticker:"GOOGL",  market:"나스닥", weight:0.62, krw:17800000000000,  type:"HOLD",      changePct:2.1,   sector:"빅테크",    color:"#F8F9FA", tc:"#6B7280" },
+  { name:"메타",              ticker:"META",   market:"나스닥", weight:0.52, krw:15000000000000,  type:"INCREASED", changePct:12.0,  sector:"빅테크",    color:"#DBEAFE", tc:"#1E40AF" },
+  { name:"한화에어로스페이스", ticker:"012450", market:"코스피", weight:0.31, krw:8900000000000,   type:"INCREASED", changePct:14.1,  sector:"방산",      color:"#DBEAFE", tc:"#1E40AF" },
+  { name:"LG에너지솔루션",    ticker:"373220", market:"코스피", weight:0.45, krw:13000000000000,  type:"HOLD",      changePct:-1.2,  sector:"2차전지",   color:"#F8F9FA", tc:"#6B7280" },
+  { name:"테슬라",            ticker:"TSLA",   market:"나스닥", weight:0.38, krw:10900000000000,  type:"HOLD",      changePct:-3.1,  sector:"자동차/EV", color:"#F8F9FA", tc:"#6B7280" },
+  { name:"TSMC",              ticker:"TSM",    market:"뉴욕",   weight:0.35, krw:10100000000000,  type:"HOLD",      changePct:4.5,   sector:"반도체",    color:"#F8F9FA", tc:"#6B7280" },
+  { name:"삼성바이오로직스",   ticker:"207940", market:"코스피", weight:0.24, krw:6900000000000,   type:"DECREASED", changePct:-11.3, sector:"바이오",    color:"#FFF7ED", tc:"#9A3412" },
+  { name:"브로드컴",          ticker:"AVGO",   market:"나스닥", weight:0.22, krw:6300000000000,   type:"HOLD",      changePct:2.8,   sector:"반도체",    color:"#F8F9FA", tc:"#6B7280" },
+  { name:"JP모건",            ticker:"JPM",    market:"뉴욕",   weight:0.19, krw:5500000000000,   type:"HOLD",      changePct:1.5,   sector:"금융",      color:"#FEF3C7", tc:"#92400E" },
+  { name:"POSCO홀딩스",       ticker:"005490", market:"코스피", weight:0.18, krw:5200000000000,   type:"DECREASED", changePct:-6.5,  sector:"소재",      color:"#FFF7ED", tc:"#9A3412" },
+  { name:"팔란티어",          ticker:"PLTR",   market:"나스닥", weight:0.14, krw:4000000000000,   type:"INCREASED", changePct:9.4,   sector:"AI/테크",   color:"#DBEAFE", tc:"#1E40AF" },
+  { name:"유나이티드헬스",     ticker:"UNH",    market:"뉴욕",   weight:0.13, krw:3800000000000,   type:"HOLD",      changePct:0,     sector:"헬스케어",  color:"#DCFCE7", tc:"#15803D" },
+  { name:"엘라이릴리",        ticker:"LLY",    market:"뉴욕",   weight:0.12, krw:3500000000000,   type:"HOLD",      changePct:3.2,   sector:"바이오",    color:"#DCFCE7", tc:"#15803D" },
+  { name:"비자",              ticker:"V",      market:"뉴욕",   weight:0.11, krw:3200000000000,   type:"HOLD",      changePct:1.1,   sector:"금융",      color:"#FEF3C7", tc:"#92400E" },
+];
+
+const SECTOR_DATA = [
+  { name:"반도체 / AI",      icon:"💾", tint:"#EFF6FF", pct:24.2, stocks:["삼성전자","엔비디아","SK하이닉스","TSMC","브로드컴","AMD"] },
+  { name:"빅테크",           icon:"💻", tint:"#F0F9FF", pct:18.1, stocks:["애플","마이크로소프트","아마존","알파벳","메타"] },
+  { name:"금융",             icon:"🏦", tint:"#FFFBEB", pct:9.4,  stocks:["JP모건","KB금융","삼성생명","신한지주","골드만삭스"] },
+  { name:"바이오 / 헬스케어", icon:"💊", tint:"#F0FDF4", pct:7.8,  stocks:["삼성바이오로직스","셀트리온","유나이티드헬스","엘라이릴리","한미약품"] },
+  { name:"방산 / 항공우주",   icon:"🚀", tint:"#FFF1F2", pct:5.3,  stocks:["한화에어로스페이스","LIG넥스원","RTX","록히드마틴"] },
+  { name:"2차전지 / EV",     icon:"🔋", tint:"#ECFDF5", pct:4.9,  stocks:["LG에너지솔루션","테슬라","LG화학","삼성SDI"] },
+  { name:"AI / 소프트웨어",   icon:"🤖", tint:"#EEF2FF", pct:4.2,  stocks:["팔란티어","AppLovin","세일즈포스","ServiceNow"] },
+  { name:"소재 / 에너지",     icon:"⚗️",  tint:"#FFF7ED", pct:3.8,  stocks:["POSCO홀딩스","고려아연","엑슨모빌","쉐브론"] },
+];
+
+// 섹터 → 칩 색상
+const SECTOR_CHIP_COLORS = {
+  "반도체": { bg:"#DBEAFE", color:"#1E40AF" },
+  "빅테크":  { bg:"#E0F2FE", color:"#0369A1" },
+  "바이오":  { bg:"#DCFCE7", color:"#15803D" },
+  "금융":    { bg:"#FEF3C7", color:"#92400E" },
+  "방산":    { bg:"#FEE2E2", color:"#DC2626" },
+  "AI/테크": { bg:"#EEF2FF", color:"#4338CA" },
+  "소재":    { bg:"#FFF7ED", color:"#9A3412" },
+  "조선/해운":{ bg:"#F0F9FF", color:"#0369A1" },
+  "소셜미디어":{ bg:"#FDF4FF", color:"#7E22CE" },
+  "자동차":  { bg:"#F1F5F9", color:"#475569" },
+  "건설":    { bg:"#F8FAFC", color:"#64748B" },
+};
+
+// ── 유틸 ──────────────────────────────────────────────────────────
+function fmt(v) {
+  if (v >= 1e15) return (v/1e15).toFixed(0)+"경원";
+  if (v >= 1e12) return (v/1e12).toFixed(1)+"조원";
+  if (v >= 1e8)  return Math.round(v/1e8)+"억원";
+  return v.toLocaleString()+"원";
+}
+
+function switchTab(name) {
+  const names = ['home','changes','portfolio','sector'];
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', names[i]===name));
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function shareText(title, text) {
+  if (navigator.share) {
+    navigator.share({ title, text }).catch(()=>{});
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => toast('복사됐어요 📋'));
+  }
+}
+
+function shareApp() {
+  shareText(
+    '국민연금 뭐샀지',
+    `국민연금 포트폴리오 생각보다 재밌네\n\n국민연금 공시 기반 포트폴리오 탐색 📊\n국민연금 뭐샀지`
+  );
+}
+
+// ── 변화 탭 ───────────────────────────────────────────────────────
+let chgFilter = 'all';
+const TYPE_META = {
+  NEW:       { label:'신규 편입', badgeClass:'badge-new',  badgeBg:'#DCFCE7', badgeTc:'#15803D', desc: c => `직전 분기에 없던 종목이에요.` },
+  INCREASED: { label:'비중 확대', badgeClass:'badge-inc',  badgeBg:'#DBEAFE', badgeTc:'#1E40AF', desc: c => `직전 분기 대비 +${c.changePct.toFixed(1)}% 확대했어요.` },
+  DECREASED: { label:'비중 축소', badgeClass:'badge-dec',  badgeBg:'#FFF7ED', badgeTc:'#9A3412', desc: c => `직전 분기 대비 ${c.changePct.toFixed(1)}% 축소했어요.` },
+  SOLD:      { label:'전량 청산', badgeClass:'badge-sold', badgeBg:'#FEE2E2', badgeTc:'#DC2626', desc: c => `이번 분기 전량 매도했어요.` },
+  HOLD:      { label:'유지',      badgeClass:'badge-hold', badgeBg:'#F2F4F6', badgeTc:'#4E5968', desc: c => `` },
+};
+
+function setChgFilter(f, btn) {
+  chgFilter = f;
+  document.querySelectorAll('#tab-changes .filter-btn').forEach(b => b.classList.remove('active'));
+  const target = btn || document.querySelector(`[data-filter="${f}"]`);
+  if (target) target.classList.add('active');
+  renderChanges();
+}
+
+function renderChanges() {
+  const list = chgFilter === 'all' ? CHANGES_DATA : CHANGES_DATA.filter(c => c.type === chgFilter);
+  const el   = document.getElementById('changes-list');
+  if (!list.length) { el.innerHTML = `<div class="empty-state">해당 유형의 변화가 없어요</div>`; return; }
+
+  el.innerHTML = list.map(c => {
+    const t = TYPE_META[c.type];
+    const stats = c.type !== 'SOLD' ? `
+      <div class="chg-item-stats">
+        <div class="chg-stat"><div class="chg-stat-val">${c.weight.toFixed(2)}%</div><div class="chg-stat-label">현재 비중</div></div>
+        <div class="chg-stat"><div class="chg-stat-val">${fmt(c.krw)}</div><div class="chg-stat-label">보유 금액</div></div>
+        ${c.changePct !== 0 ? `<div class="chg-stat"><div class="chg-stat-val" style="color:${c.changePct>0?'#0BB25F':'#DC2626'}">${c.changePct>0?'+':''}${c.changePct.toFixed(1)}%</div><div class="chg-stat-label">직전 분기 대비</div></div>` : ''}
+      </div>` : '';
+
+    return `
+      <div class="chg-item" onclick="openStockSheet('${c.name}','${c.ticker}',${c.weight},${c.krw},'${c.type}',${c.changePct},'${c.sector}')">
+        <div class="chg-item-top">
+          <div>
+            <div class="chg-stock-name">${c.name}</div>
+            <div class="chg-stock-ticker">${c.ticker} · ${c.market}</div>
+          </div>
+          <span class="chg-sum-badge ${t.badgeClass}">${t.label}</span>
+        </div>
+        <div class="chg-item-desc">${t.desc(c)}</div>
+        ${stats}
+      </div>`;
+  }).join('');
+}
+
+// ── 포트폴리오 탭 ─────────────────────────────────────────────────
+let sortFilter = 'weight';
+
+function setSortFilter(f, btn) {
+  sortFilter = f;
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderPortfolio();
+}
+
+function renderPortfolio() {
+  let data = [...PORTFOLIO_DATA];
+  if (sortFilter === 'amount') data.sort((a,b) => b.krw - a.krw);
+  else if (sortFilter === 'change') data.sort((a,b) => Math.abs(b.changePct) - Math.abs(a.changePct));
+
+  document.getElementById('portfolio-list').innerHTML = data.map((h, i) => {
+    let chgHtml = '';
+    if (h.type === 'NEW')       chgHtml = `<div class="port-chg new">신규</div>`;
+    else if (h.type === 'INCREASED') chgHtml = `<div class="port-chg up">▲ +${h.changePct.toFixed(1)}%</div>`;
+    else if (h.type === 'DECREASED') chgHtml = `<div class="port-chg dn">▼ ${Math.abs(h.changePct).toFixed(1)}%</div>`;
+
+    return `
+      <div class="port-row" onclick="openStockSheet('${h.name}','${h.ticker}',${h.weight},${h.krw},'${h.type}',${h.changePct},'${h.sector}')">
+        <div class="port-rank">${i+1}</div>
+        <div class="port-icon" style="background:${h.color};color:${h.tc}">${h.name[0]}</div>
+        <div class="port-info">
+          <div class="port-name">${h.name}</div>
+          <div class="port-ticker">${h.ticker}</div>
+        </div>
+        <div class="port-right">
+          <div class="port-pct">${h.weight.toFixed(2)}%</div>
+          <div class="port-krw">${fmt(h.krw)}</div>
+          ${chgHtml}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── 섹터 탭 ───────────────────────────────────────────────────────
+function renderSectors() {
+  const maxPct = Math.max(...SECTOR_DATA.map(s => s.pct));
+  document.getElementById('sector-list').innerHTML = SECTOR_DATA.map(s => `
+    <div class="sector-card">
+      <div class="sector-top">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="sector-icon-wrap" style="background:${s.tint}">${s.icon}</div>
+          <div class="sector-name">${s.name}</div>
+        </div>
+        <div class="sector-right">
+          <div class="sector-pct">${s.pct}%</div>
+          <div class="sector-pct-label">포트 비중</div>
+        </div>
+      </div>
+      <div class="sector-bar-bg"><div class="sector-bar" style="width:${(s.pct/maxPct*100).toFixed(0)}%"></div></div>
+      <div class="sector-chips">${s.stocks.map(st => `<span class="sector-chip">${st}</span>`).join('')}</div>
+    </div>
+  `).join('');
+}
+
+// ── 바텀시트 ──────────────────────────────────────────────────────
+let curStock = null;
+
+function openStockSheet(name, ticker, weight, krw, type, changePct, sector) {
+  curStock = { name, ticker, weight, krw, type, changePct, sector };
+  const t = TYPE_META[type] || TYPE_META['HOLD'];
+
+  document.getElementById('sh-name').textContent   = name + (ticker !== name ? ` (${ticker})` : '');
+  document.getElementById('sh-weight').textContent = type !== 'SOLD' ? `${weight.toFixed(2)}%` : '청산';
+  document.getElementById('sh-krw').textContent    = type !== 'SOLD' ? fmt(krw) : '-';
+
+  const badge = document.getElementById('sh-badge');
+  badge.textContent       = t.label;
+  badge.style.background  = t.badgeBg;
+  badge.style.color       = t.badgeTc;
+
+  const chgData = CHANGES_DATA.find(c => c.ticker === ticker);
+  const portData = PORTFOLIO_DATA.find(p => p.ticker === ticker);
+  const portRank = portData ? PORTFOLIO_DATA.indexOf(portData) + 1 : null;
+  const coHeld   = chgData?.coHeld || [];
+  const secData  = SECTOR_DATA.find(s => s.stocks.includes(name));
+  const chipColor = SECTOR_CHIP_COLORS[sector] || { bg:'#EEF2FF', color:'#4338CA' };
+
+  let html = '';
+
+  // 현재 보유
+  if (type !== 'SOLD') {
+    html += `
+      <div class="sh-section">
+        <div class="sh-section-title">현재 보유</div>
+        <div class="sh-stat-row">
+          <div class="sh-stat"><div class="sh-stat-val">${weight.toFixed(2)}%</div><div class="sh-stat-label">보유 비중</div></div>
+          <div class="sh-stat"><div class="sh-stat-val">${fmt(krw)}</div><div class="sh-stat-label">보유 금액</div></div>
+          ${portRank ? `<div class="sh-stat"><div class="sh-stat-val">${portRank}위</div><div class="sh-stat-label">전체 순위</div></div>` : ''}
+        </div>
+      </div>`;
+  }
+
+  // 최근 변화
+  html += `
+    <div class="sh-section">
+      <div class="sh-section-title">직전 분기 대비 변화</div>
+      <div class="sh-change-row">
+        <div class="sh-change-label">변화 유형</div>
+        <div class="sh-change-val" style="color:${t.badgeTc}">${t.label}</div>
+      </div>
+      ${changePct !== 0 ? `
+      <div class="sh-change-row">
+        <div class="sh-change-label">변화율</div>
+        <div class="sh-change-val" style="color:${changePct>0?'#0BB25F':'#DC2626'}">${changePct>0?'+':''}${changePct.toFixed(1)}%</div>
+      </div>` : ''}
+      <div class="sh-change-row">
+        <div class="sh-change-label">비교 기준</div>
+        <div class="sh-change-val" style="color:#6B7280">2025 Q4 → 2026 Q1</div>
+      </div>
+    </div>`;
+
+  // 같이 보유한 종목 — 분기별 추세
+  if (coHeld.length > 0) {
+    const chipC = SECTOR_CHIP_COLORS[sector] || { bg:'#EEF2FF', color:'#4338CA' };
+    html += `
+      <div class="sh-section">
+        <div class="sh-section-title">같이 보유한 종목</div>
+        <div class="trend-header">
+          <span class="trend-q-label">Q3</span>
+          <span class="trend-q-label">Q4</span>
+          <span class="trend-q-label">Q1</span>
+        </div>
+        ${coHeld.map(s => `
+          <div class="trend-row">
+            <span class="trend-name" style="color:${chipC.color}">${s.name}</span>
+            <div class="trend-dots">
+              ${s.trend.map(on => `<div class="trend-dot ${on ? 'on' : 'off'}"></div>`).join('')}
+            </div>
+          </div>`).join('')}
+      </div>`;
+  }
+
+  // 섹터
+  if (secData) {
+    html += `
+      <div class="sh-section">
+        <div class="sh-section-title">섹터</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="sector-icon-wrap" style="background:${secData.tint};width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">${secData.icon}</div>
+          <div>
+            <div style="font-size:15px;font-weight:800;color:#191F28">${secData.name}</div>
+            <div style="font-size:11px;color:#ADB5BD;margin-top:2px">포트 비중 ${secData.pct}%</div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  document.getElementById('sh-content').innerHTML = html;
+  document.getElementById('overlay').style.display = 'block';
+  setTimeout(() => document.getElementById('stock-sheet').classList.add('open'), 10);
+}
+
+function closeSheet() {
+  document.getElementById('stock-sheet').classList.remove('open');
+  document.getElementById('overlay').style.display = 'none';
+}
+
+function shareStock() {
+  if (!curStock) return;
+  const t = TYPE_META[curStock.type];
+  const lines = [
+    `국민연금이 이번 분기 ${t.label}한 종목`,
+    ``,
+    `${curStock.name} (${curStock.ticker})`,
+    curStock.type !== 'SOLD' ? `보유 비중 ${curStock.weight.toFixed(2)}% · ${fmt(curStock.krw)}` : '이번 분기 전량 매도',
+    curStock.changePct && curStock.changePct !== 0 ? `직전 분기 대비 ${curStock.changePct > 0 ? '+' : ''}${curStock.changePct.toFixed(1)}%` : '',
+    ``,
+    `국민연금 뭐샀지 📊`,
+  ].filter(Boolean).join('\n');
+  shareText(`국민연금 ${curStock.name} 보유 현황`, lines);
+}
+
+// ── 초기화 ────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  loadRate();
+  renderChanges();
+  renderPortfolio();
+  renderSectors();
+});
+</script>
+</body>
+</html>
