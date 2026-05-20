@@ -60,7 +60,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI',
 .section-title { font-size: 11px; font-weight: 700; color: #ADB5BD; padding: 0 12px; margin: 10px 0 6px; letter-spacing: 0.3px; }
 
 /* ── 변화 요약 (홈) ──────────────────────── */
-.chg-summary { margin: 0 12px 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.chg-summary { margin: 0 12px 8px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 .chg-sum-card { background: #fff; border-radius: 10px; padding: 11px 12px; cursor: pointer; transition: transform 0.1s, opacity 0.1s; }
 .chg-sum-card:active { transform: scale(0.97); opacity: 0.9; }
 .chg-sum-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; display: inline-block; margin-bottom: 6px; }
@@ -317,6 +317,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI',
   </div>
   <div id="home-gainers"></div>
 
+  <div class="disclaimer-invest"><p>⚠️ 본 정보는 투자 권유가 아닙니다. 공시 지표를 기반으로 한 참고용 자료이며, 투자 판단과 그 결과는 본인에게 있습니다.</p></div>
   <div class="disclaimer">
     <p>🇺🇸 미국은 SEC 13F 전종목 · 🇰🇷 국내는 DART 대량보유 공시 기준 <strong>5% 이상 종목만</strong> 표시 · 직전 분기와 비교</p>
   </div>
@@ -333,7 +334,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI',
     <button class="filter-btn"        data-filter="NEW"       onclick="setChgFilter('NEW',this)">🟢 신규</button>
     <button class="filter-btn"        data-filter="INCREASED" onclick="setChgFilter('INCREASED',this)">🔼 확대</button>
     <button class="filter-btn"        data-filter="DECREASED" onclick="setChgFilter('DECREASED',this)">🔽 축소</button>
-    <button class="filter-btn"        data-filter="SOLD"      onclick="setChgFilter('SOLD',this)">🔴 청산</button>
+  </div>
+  <div class="search-wrap">
+    <input class="search-input" id="changes-search" type="text" placeholder="종목명 검색..." oninput="renderChanges()">
   </div>
   <div id="changes-list"></div>
   <div class="disclaimer-invest"><p>⚠️ 본 정보는 투자 권유가 아니며 참고용입니다. 투자 판단과 그 결과는 본인에게 있습니다.</p></div>
@@ -625,8 +628,6 @@ function renderHomeChangeSummary() {
   const newItems = usData.holdings.filter(h => h.changeType === 'NEW');
   const incItems = usData.holdings.filter(h => h.changeType === 'INCREASED').sort((a,b) => (b.changePct||0)-(a.changePct||0));
   const decItems = usData.holdings.filter(h => h.changeType === 'DECREASED').sort((a,b) => (a.changePct||0)-(b.changePct||0));
-  const soldItems = usData.sold || [];
-
   const card = (type, items, badgeClass, label) => {
     const top2 = items.slice(0,2).map(h => lookup(h.name).d);
     const more = items.length - 2;
@@ -641,8 +642,7 @@ function renderHomeChangeSummary() {
   document.getElementById('home-chg-summary').innerHTML =
     card('NEW', newItems, 'badge-new', '신규 편입') +
     card('INCREASED', incItems, 'badge-inc', '비중 확대') +
-    card('DECREASED', decItems, 'badge-dec', '비중 축소') +
-    card('SOLD', soldItems, 'badge-sold', '청산');
+    card('DECREASED', decItems, 'badge-dec', '비중 축소');
 }
 
 // ── 홈: TOP 5 ────────────────────────────────────────────────────
@@ -708,24 +708,23 @@ function setChgFilter(f, btn) {
 
 function renderChanges() {
   if (!usData) return;
-  const sold = (usData.sold||[]).map(h => ({...h, changeType:'SOLD', changePct:-100, pct:0, valueKrw:0}));
-  const changed = usData.holdings.filter(h => h.changeType !== 'HOLD');
+  const q = (document.getElementById('changes-search')?.value || '').toLowerCase();
+  const changed = usData.holdings.filter(h => h.changeType !== 'HOLD' && h.changeType !== 'SOLD');
 
   let list;
   if (chgFilter === 'all') {
-    const newItems  = changed.filter(h => h.changeType === 'NEW').slice(0, 5);
-    const incItems  = changed.filter(h => h.changeType === 'INCREASED').sort((a,b) => (b.changePct||0)-(a.changePct||0)).slice(0, 8);
-    const decItems  = changed.filter(h => h.changeType === 'DECREASED').sort((a,b) => (a.changePct||0)-(b.changePct||0)).slice(0, 5);
-    const soldItems = sold.slice(0, 5);
-    list = [...newItems, ...incItems, ...decItems, ...soldItems];
-  } else if (chgFilter === 'SOLD') {
-    list = sold;
+    const newItems = changed.filter(h => h.changeType === 'NEW').slice(0, 5);
+    const incItems = changed.filter(h => h.changeType === 'INCREASED').sort((a,b) => (b.changePct||0)-(a.changePct||0)).slice(0, 8);
+    const decItems = changed.filter(h => h.changeType === 'DECREASED').sort((a,b) => (a.changePct||0)-(b.changePct||0)).slice(0, 5);
+    list = [...newItems, ...incItems, ...decItems];
   } else {
     list = changed.filter(h => h.changeType === chgFilter);
     if (chgFilter === 'INCREASED') list.sort((a,b) => (b.changePct||0)-(a.changePct||0));
     if (chgFilter === 'DECREASED') list.sort((a,b) => (a.changePct||0)-(b.changePct||0));
     list = list.slice(0, 20);
   }
+
+  if (q) list = list.filter(h => lookup(h.name).d.toLowerCase().includes(q) || (lookup(h.name).t||'').toLowerCase().includes(q));
 
   const el = document.getElementById('changes-list');
   if (!list.length) { el.innerHTML = `<div class="empty-state">해당 유형의 변화가 없어요</div>`; return; }
