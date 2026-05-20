@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>국민연금 뭐샀지</title>
+<title>국민연금픽</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI', sans-serif; background: #F2F4F6; color: #191F28; min-height: 100vh; }
@@ -222,7 +222,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI',
 <!-- 헤더 -->
 <div class="header">
   <div>
-    <div class="header-title">국민연금 뭐샀지</div>
+    <div class="header-title">국민연금픽</div>
     <div class="header-sub">국민연금 공시 기반 포트폴리오 탐색</div>
   </div>
   <button class="header-share" onclick="shareApp()">공유 🔗</button>
@@ -549,6 +549,11 @@ function switchTab(name) {
   document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', names[i]===name));
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
+  // 탭 전환 시 검색창 초기화
+  const cs = document.getElementById('changes-search');
+  const ps = document.getElementById('portfolio-search');
+  if (cs) { cs.value = ''; renderChanges(); }
+  if (ps) { ps.value = ''; renderPortfolio(); }
 }
 
 function toast(msg) {
@@ -564,7 +569,7 @@ function shareText(title, text) {
 }
 
 function shareApp() {
-  shareText('국민연금 뭐샀지', `국민연금 포트폴리오 생각보다 재밌네\n\n국민연금 공시 기반 포트폴리오 탐색 📊\n국민연금 뭐샀지`);
+  shareText('국민연금픽', `국민연금 포트폴리오 생각보다 재밌네\n\n국민연금 공시 기반 포트폴리오 탐색 📊\n국민연금픽\nhttps://pnu10.github.io/nps-tracker/`);
 }
 
 // ── 데이터 로딩 ───────────────────────────────────────────────────
@@ -996,7 +1001,7 @@ function shareStock() {
       `국민연금 ${curStock.corp_name} ${curStock.pct.toFixed(2)}% 보유`, ``,
       t.label !== '유지' ? `직전 공시 대비 ${t.label}` : '',
       curStock.changePct ? `${curStock.changePct>0?'+':''}${curStock.changePct.toFixed(2)}%p` : '',
-      ``, `국민연금 뭐샀지 📊\nhttps://pnu10.github.io/nps-tracker/`,
+      ``, `국민연금픽 📊\nhttps://pnu10.github.io/nps-tracker/`,
     ].filter(Boolean).join('\n');
     shareText(`국민연금 ${curStock.corp_name} 보유 현황`, lines);
     return;
@@ -1007,7 +1012,7 @@ function shareStock() {
     `${curStock.name}${curStock.ticker ? ` (${curStock.ticker})` : ''}`,
     curStock.type !== 'SOLD' ? `보유 비중 ${curStock.weight.toFixed(2)}% · ${fmt(curStock.krw)}` : '이번 분기 전량 매도',
     curStock.changePct && curStock.changePct !== 0 ? `직전 분기 대비 ${curStock.changePct>0?'+':''}${curStock.changePct.toFixed(1)}%` : '',
-    ``, `국민연금 뭐샀지 📊\nhttps://pnu10.github.io/nps-tracker/`,
+    ``, `국민연금픽 📊\nhttps://pnu10.github.io/nps-tracker/`,
   ].filter(Boolean).join('\n');
   shareText(`국민연금 ${curStock.name} 보유 현황`, lines);
 }
