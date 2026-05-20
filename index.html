@@ -670,7 +670,7 @@ function renderTopHoldings() {
       ${top5.map((h,i) => {
         const info = lookup(h.name);
         return `
-          <div class="holding-row" onclick="openStockSheet(${JSON.stringify(info.d)},${JSON.stringify(info.t)},${h.pct},${h.valueKrw},${JSON.stringify(h.changeType)},${h.changePct||0},${JSON.stringify(info.s)})">
+          <div class="holding-row" onclick='openStockSheet(${JSON.stringify(info.d)},${JSON.stringify(info.t)},${h.pct},${h.valueKrw},${JSON.stringify(h.changeType)},${h.changePct||0},${JSON.stringify(info.s)})'>
             <div class="holding-rank">${i+1}</div>
             <div class="holding-info">
               <div class="holding-name">${info.d}</div>
@@ -700,12 +700,12 @@ function renderTopGainers() {
       ${items.map(h => {
         const info = lookup(h.name);
         if (h.changeType === 'NEW') return `
-          <div class="gain-card" onclick="openStockSheet(${JSON.stringify(info.d)},${JSON.stringify(info.t)},${h.pct},${h.valueKrw},'NEW',0,${JSON.stringify(info.s)})">
+          <div class="gain-card" onclick='openStockSheet(${JSON.stringify(info.d)},${JSON.stringify(info.t)},${h.pct},${h.valueKrw},"NEW",0,${JSON.stringify(info.s)})'>
             <div><div class="gain-name">${info.d}${info.t ? ` (${info.t})` : ''}</div><div class="gain-sub">${info.s} · 직전 분기에 없던 종목</div></div>
             <div class="gain-pct purple">NEW</div>
           </div>`;
         return `
-          <div class="gain-card" onclick="openStockSheet(${JSON.stringify(info.d)},${JSON.stringify(info.t)},${h.pct},${h.valueKrw},'INCREASED',${h.changePct||0},${JSON.stringify(info.s)})">
+          <div class="gain-card" onclick='openStockSheet(${JSON.stringify(info.d)},${JSON.stringify(info.t)},${h.pct},${h.valueKrw},"INCREASED",${h.changePct||0},${JSON.stringify(info.s)})'>
             <div><div class="gain-name">${info.d}${info.t ? ` (${info.t})` : ''}</div><div class="gain-sub">${info.s} · 비중 확대</div></div>
             <div><div class="gain-pct">+${(h.changePct||0).toFixed(1)}%</div><div style="font-size:10px;color:#ADB5BD;text-align:right;margin-top:2px;font-weight:600">vs 직전 분기</div></div>
           </div>`;
@@ -755,7 +755,7 @@ function renderChanges() {
         ${h.changePct && h.changePct !== 0 ? `<div class="chg-stat"><div class="chg-stat-val" style="color:${h.changePct>0?'#0BB25F':'#DC2626'}">${h.changePct>0?'+':''}${h.changePct.toFixed(1)}%</div><div class="chg-stat-label">직전 분기 대비</div></div>` : ''}
       </div>` : '';
     return `
-      <div class="chg-item" onclick="openStockSheet(${JSON.stringify(info.d)},${JSON.stringify(info.t)},${h.pct||0},${h.valueKrw||0},${JSON.stringify(h.changeType)},${h.changePct||0},${JSON.stringify(info.s)})">
+      <div class="chg-item" onclick='openStockSheet(${JSON.stringify(info.d)},${JSON.stringify(info.t)},${h.pct||0},${h.valueKrw||0},${JSON.stringify(h.changeType)},${h.changePct||0},${JSON.stringify(info.s)})'>
         <div class="chg-item-top">
           <div>
             <div class="chg-stock-name">${info.d}</div>
@@ -804,7 +804,7 @@ function renderPortfolio() {
         : h.changeType==='DECREASED' ? `<div class="port-chg dn">▼ ${Math.abs(h.changePct||0).toFixed(1)}%</div>` : '';
       const bg = h.changeType==='NEW'?'#DCFCE7':h.changeType==='INCREASED'?'#DBEAFE':h.changeType==='DECREASED'?'#FFF7ED':'#F8F9FA';
       const tc = h.changeType==='NEW'?'#15803D':h.changeType==='INCREASED'?'#1E40AF':h.changeType==='DECREASED'?'#9A3412':'#6B7280';
-      return `<div class="port-row" onclick="openStockSheet(${JSON.stringify(info.d)},${JSON.stringify(info.t)},${h.pct},${h.valueKrw},${JSON.stringify(h.changeType)},${h.changePct||0},${JSON.stringify(info.s)})">
+      return `<div class="port-row" onclick='openStockSheet(${JSON.stringify(info.d)},${JSON.stringify(info.t)},${h.pct},${h.valueKrw},${JSON.stringify(h.changeType)},${h.changePct||0},${JSON.stringify(info.s)})'>
         <div class="port-rank">${i+1}</div>
         <div class="port-icon" style="background:${bg};color:${tc}">${info.d.charAt(0)}</div>
         <div class="port-info"><div class="port-name">${info.d}</div><div class="port-ticker">${info.t || info.m}</div></div>
@@ -826,7 +826,7 @@ function renderPortfolio() {
           : h.changeType==='DECREASED' ? `<div class="port-chg dn">▼ ${Math.abs(h.changePct||0).toFixed(2)}%p</div>` : '';
         const bg = h.changeType==='NEW'?'#DCFCE7':h.changeType==='INCREASED'?'#DBEAFE':h.changeType==='DECREASED'?'#FFF7ED':'#F2F4F6';
         const tc = h.changeType==='NEW'?'#15803D':h.changeType==='INCREASED'?'#1E40AF':h.changeType==='DECREASED'?'#9A3412':'#4E5968';
-        return `<div class="port-row" onclick="openKrStockSheet(${JSON.stringify(h)})">
+        return `<div class="port-row" onclick='openKrStockSheet(${JSON.stringify(h)})'>
           <div class="port-rank">${i+1}</div>
           <div class="port-icon" style="background:${bg};color:${tc}">${h.corp_name.charAt(0)}</div>
           <div class="port-info"><div class="port-name">${h.corp_name}</div><div class="port-ticker">코스피 · ${h.rcept_dt.slice(0,10).replace(/-/g,'.')} 공시</div></div>
@@ -867,7 +867,7 @@ function renderSectors() {
     .sort((a,b) => b.pct-a.pct).slice(0,10);
   const maxPct = sectors[0]?.pct || 1;
   document.getElementById('sector-list').innerHTML = sectors.map(s => `
-    <div class="sector-card" onclick="openSectorSheet(${JSON.stringify(s.name)})">
+    <div class="sector-card" onclick='openSectorSheet(${JSON.stringify(s.name)})'>
       <div class="sector-top">
         <div style="display:flex;align-items:center;gap:10px">
           <div class="sector-icon-wrap" style="background:${s.tint}">${s.icon}</div>
