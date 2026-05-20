@@ -240,22 +240,22 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI',
   <div class="hero-card">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
       <div class="hero-eyebrow" style="margin-bottom:0">국민연금공단 공시 기준</div>
-      <div style="background:rgba(255,255,255,0.12);border-radius:8px;padding:4px 9px;font-size:11px;font-weight:700;color:rgba(255,255,255,0.75);white-space:nowrap">2025 Q4 → 2026 Q1</div>
+      <div id="hero-quarter" style="background:rgba(255,255,255,0.12);border-radius:8px;padding:4px 9px;font-size:11px;font-weight:700;color:rgba(255,255,255,0.75);white-space:nowrap">로딩 중...</div>
     </div>
-    <div class="hero-value">182조원</div>
-    <div class="hero-label">국내외 주식 보유 총액</div>
+    <div class="hero-value" id="hero-total">—</div>
+    <div class="hero-label">미국 주식 보유 총액 (SEC 13F 기준)</div>
     <div class="hero-stats">
       <div class="hero-stat">
-        <div class="hero-stat-val">561개</div>
-        <div class="hero-stat-label">보유 종목</div>
+        <div class="hero-stat-val" id="hero-count">—</div>
+        <div class="hero-stat-label">미국 보유 종목</div>
       </div>
       <div class="hero-stat">
-        <div class="hero-stat-val">국내 45%</div>
-        <div class="hero-stat-label">국내 비중</div>
+        <div class="hero-stat-val" id="hero-new">—</div>
+        <div class="hero-stat-label">신규 편입</div>
       </div>
       <div class="hero-stat">
-        <div class="hero-stat-val">미국 38%</div>
-        <div class="hero-stat-label">미국 비중</div>
+        <div class="hero-stat-val" id="hero-sold">—</div>
+        <div class="hero-stat-label">청산</div>
       </div>
     </div>
   </div>
@@ -276,12 +276,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI',
   <div class="stats-grid">
     <div class="stat-card">
       <div class="stat-label">신규 편입</div>
-      <div class="stat-value">8개</div>
+      <div class="stat-value" id="kpi-new">—</div>
       <div class="stat-sub">전분기 대비</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">청산 종목</div>
-      <div class="stat-value">5개</div>
+      <div class="stat-value" id="kpi-sold">—</div>
       <div class="stat-sub red">전량 매도</div>
     </div>
   </div>
@@ -291,86 +291,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI',
     <div class="section-title" style="padding:0;margin:0">이번 분기 변화</div>
     <div style="font-size:11px;font-weight:700;color:#ADB5BD">직전 분기 대비</div>
   </div>
-  <div class="chg-summary">
-    <div class="chg-sum-card" onclick="switchTab('changes');setChgFilter('NEW',document.querySelector('[data-filter=NEW]'))">
-      <span class="chg-sum-badge badge-new">신규 편입</span>
-      <div class="chg-sum-item">알테오젠</div>
-      <div class="chg-sum-item">AppLovin</div>
-      <div class="chg-sum-more">+6개 →</div>
-    </div>
-    <div class="chg-sum-card" onclick="switchTab('changes');setChgFilter('INCREASED',document.querySelector('[data-filter=INCREASED]'))">
-      <span class="chg-sum-badge badge-inc">비중 확대</span>
-      <div class="chg-sum-item">엔비디아</div>
-      <div class="chg-sum-item">한화에어로</div>
-      <div class="chg-sum-more">+12개 →</div>
-    </div>
-    <div class="chg-sum-card" onclick="switchTab('changes');setChgFilter('DECREASED',document.querySelector('[data-filter=DECREASED]'))">
-      <span class="chg-sum-badge badge-dec">비중 축소</span>
-      <div class="chg-sum-item">애플</div>
-      <div class="chg-sum-item">삼성바이오</div>
-      <div class="chg-sum-more">+9개 →</div>
-    </div>
-    <div class="chg-sum-card" onclick="switchTab('changes');setChgFilter('SOLD',document.querySelector('[data-filter=SOLD]'))">
-      <span class="chg-sum-badge badge-sold">청산</span>
-      <div class="chg-sum-item">기아</div>
-      <div class="chg-sum-item">Pinterest</div>
-      <div class="chg-sum-more">+3개 →</div>
-    </div>
-  </div>
+  <div class="chg-summary" id="home-chg-summary"></div>
 
   <!-- TOP 5 보유 -->
   <div class="section-title">가장 많이 보유한 종목</div>
-  <div class="holding-list">
-    <div class="holding-row" onclick="openStockSheet('삼성전자','005930',2.85,82000000000000,'HOLD',0,'반도체')">
-      <div class="holding-rank">1</div>
-      <div class="holding-info"><div class="holding-name">삼성전자</div><div class="holding-ticker">005930 · 코스피</div></div>
-      <div class="holding-right"><div class="holding-pct">2.85%</div><div class="holding-krw">82.0조원</div></div>
-    </div>
-    <div class="holding-row" onclick="openStockSheet('애플','AAPL',1.42,40900000000000,'DECREASED',-8.2,'빅테크')">
-      <div class="holding-rank">2</div>
-      <div class="holding-info"><div class="holding-name">애플</div><div class="holding-ticker">AAPL · 나스닥</div></div>
-      <div class="holding-right"><div class="holding-pct">1.42%</div><div class="holding-krw">40.9조원</div></div>
-    </div>
-    <div class="holding-row" onclick="openStockSheet('엔비디아','NVDA',1.18,34000000000000,'INCREASED',18.3,'반도체')">
-      <div class="holding-rank">3</div>
-      <div class="holding-info"><div class="holding-name">엔비디아</div><div class="holding-ticker">NVDA · 나스닥</div></div>
-      <div class="holding-right"><div class="holding-pct">1.18%</div><div class="holding-krw">34.0조원</div></div>
-    </div>
-    <div class="holding-row" onclick="openStockSheet('마이크로소프트','MSFT',0.98,28200000000000,'HOLD',0,'빅테크')">
-      <div class="holding-rank">4</div>
-      <div class="holding-info"><div class="holding-name">마이크로소프트</div><div class="holding-ticker">MSFT · 나스닥</div></div>
-      <div class="holding-right"><div class="holding-pct">0.98%</div><div class="holding-krw">28.2조원</div></div>
-    </div>
-    <div class="holding-row" onclick="openStockSheet('아마존','AMZN',0.76,21900000000000,'INCREASED',6.1,'빅테크')">
-      <div class="holding-rank">5</div>
-      <div class="holding-info"><div class="holding-name">아마존</div><div class="holding-ticker">AMZN · 나스닥</div></div>
-      <div class="holding-right"><div class="holding-pct">0.76%</div><div class="holding-krw">21.9조원</div></div>
-    </div>
-  </div>
+  <div id="home-holdings"></div>
 
   <!-- 많이 늘린 종목 -->
   <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0 12px;margin:10px 0 6px">
     <div class="section-title" style="padding:0;margin:0">많이 늘린 종목</div>
     <div style="font-size:11px;font-weight:700;color:#ADB5BD">직전 분기 대비</div>
   </div>
-  <div class="gain-list">
-    <div class="gain-card" onclick="openStockSheet('엔비디아','NVDA',1.18,34000000000000,'INCREASED',18.3,'반도체')">
-      <div><div class="gain-name">엔비디아 (NVDA)</div><div class="gain-sub">반도체 · 비중 확대</div></div>
-      <div><div class="gain-pct">+18.3%</div><div style="font-size:10px;color:#ADB5BD;text-align:right;margin-top:2px;font-weight:600">vs 직전 분기</div></div>
-    </div>
-    <div class="gain-card" onclick="openStockSheet('한화에어로스페이스','012450',0.31,8900000000000,'INCREASED',14.1,'방산')">
-      <div><div class="gain-name">한화에어로스페이스</div><div class="gain-sub">방산 · 비중 확대</div></div>
-      <div><div class="gain-pct">+14.1%</div><div style="font-size:10px;color:#ADB5BD;text-align:right;margin-top:2px;font-weight:600">vs 직전 분기</div></div>
-    </div>
-    <div class="gain-card" onclick="openStockSheet('메타','META',0.52,15000000000000,'INCREASED',12.0,'빅테크')">
-      <div><div class="gain-name">메타 (META)</div><div class="gain-sub">빅테크 · 비중 확대</div></div>
-      <div><div class="gain-pct">+12.0%</div><div style="font-size:10px;color:#ADB5BD;text-align:right;margin-top:2px;font-weight:600">vs 직전 분기</div></div>
-    </div>
-    <div class="gain-card" onclick="openStockSheet('알테오젠','196170',0.08,2300000000000,'NEW',0,'바이오')">
-      <div><div class="gain-name">알테오젠</div><div class="gain-sub">바이오 · 직전 분기에 없던 종목</div></div>
-      <div class="gain-pct purple">NEW</div>
-    </div>
-  </div>
+  <div id="home-gainers"></div>
 
   <div class="disclaimer">
     <p>🇺🇸 미국은 SEC 13F 전종목 · 🇰🇷 국내는 DART 대량보유 공시 기준 <strong>5% 이상 종목만</strong> 표시 · 직전 분기와 비교</p>
@@ -436,163 +368,143 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI',
 <div class="toast" id="toast"></div>
 
 <script>
-// ── 환율 ──────────────────────────────────────────────────────────
 const API_BASE = "https://nps-tracker.pnut102142.workers.dev";
 
-async function loadRate() {
-  try {
-    const res = await fetch(`${API_BASE}/api/exchange-rate`);
-    const d   = await res.json();
-    document.getElementById('rate-value').textContent = `${Math.round(d.rate).toLocaleString()}원`;
-    document.getElementById('rate-date').textContent  = `${d.date} 기준`;
-    document.getElementById('rate-dot').classList.remove('loading');
-  } catch {
-    document.getElementById('rate-value').textContent = '조회 실패';
-  }
-}
-
-// ── 데이터 ────────────────────────────────────────────────────────
-// coHeld trend: [Q3 2025, Q4 2025, Q1 2026]
-const CHANGES_DATA = [
-  { name:"알테오젠",          ticker:"196170", market:"코스피", type:"NEW",       changePct:0,     weight:0.08, krw:2300000000000,  sector:"바이오",
-    coHeld:[
-      { name:"삼성바이오로직스", trend:[true,  true,  true]  },
-      { name:"셀트리온",         trend:[false, true,  true]  },
-      { name:"리제네론",         trend:[true,  true,  true]  },
-    ]},
-  { name:"AppLovin",          ticker:"APP",    market:"나스닥", type:"NEW",       changePct:0,     weight:0.06, krw:1700000000000,  sector:"AI/테크",
-    coHeld:[
-      { name:"엔비디아",   trend:[true,  true,  true]  },
-      { name:"팔란티어",   trend:[false, false, true]  },
-      { name:"브로드컴",   trend:[true,  true,  true]  },
-    ]},
-  { name:"Reddit",            ticker:"RDDT",   market:"뉴욕",   type:"NEW",       changePct:0,     weight:0.04, krw:1100000000000,  sector:"소셜미디어",
-    coHeld:[
-      { name:"메타",   trend:[true,  true,  true]  },
-      { name:"알파벳", trend:[true,  true,  true]  },
-    ]},
-  { name:"HD현대마린솔루션",   ticker:"443060", market:"코스피", type:"NEW",       changePct:0,     weight:0.03, krw:860000000000,   sector:"조선/해운",
-    coHeld:[
-      { name:"HD현대중공업", trend:[true, true,  true]  },
-      { name:"삼성중공업",   trend:[true, false, true]  },
-    ]},
-  { name:"엔비디아",           ticker:"NVDA",   market:"나스닥", type:"INCREASED", changePct:18.3,  weight:1.18, krw:34000000000000, sector:"반도체",
-    coHeld:[
-      { name:"TSMC",   trend:[true,  true,  true]  },
-      { name:"AMD",    trend:[false, true,  true]  },
-      { name:"브로드컴", trend:[true, true,  true]  },
-    ]},
-  { name:"한화에어로스페이스",  ticker:"012450", market:"코스피", type:"INCREASED", changePct:14.1,  weight:0.31, krw:8900000000000,  sector:"방산",
-    coHeld:[
-      { name:"LIG넥스원", trend:[true, true,  true]  },
-      { name:"현대로템",   trend:[true, true,  true]  },
-      { name:"RTX",       trend:[true, false, true]  },
-    ]},
-  { name:"메타",               ticker:"META",   market:"나스닥", type:"INCREASED", changePct:12.0,  weight:0.52, krw:15000000000000, sector:"빅테크",
-    coHeld:[
-      { name:"알파벳", trend:[true, true, true]  },
-      { name:"아마존", trend:[true, true, true]  },
-    ]},
-  { name:"팔란티어",           ticker:"PLTR",   market:"나스닥", type:"INCREASED", changePct:9.4,   weight:0.14, krw:4000000000000,  sector:"AI/테크",
-    coHeld:[
-      { name:"엔비디아",  trend:[true,  true,  true]  },
-      { name:"AppLovin", trend:[false, false, true]  },
-      { name:"데이터독",  trend:[true,  true,  false] },
-    ]},
-  { name:"현대건설",           ticker:"000720", market:"코스피", type:"INCREASED", changePct:7.8,   weight:0.11, krw:3200000000000,  sector:"건설",
-    coHeld:[
-      { name:"GS건설",  trend:[true, true, true]  },
-      { name:"삼성물산", trend:[true, true, true]  },
-    ]},
-  { name:"아마존",             ticker:"AMZN",   market:"나스닥", type:"INCREASED", changePct:6.1,   weight:0.76, krw:21900000000000, sector:"빅테크",
-    coHeld:[
-      { name:"마이크로소프트", trend:[true, true, true]  },
-      { name:"메타",           trend:[true, true, true]  },
-      { name:"구글",           trend:[true, true, true]  },
-    ]},
-  { name:"애플",               ticker:"AAPL",   market:"나스닥", type:"DECREASED", changePct:-8.2,  weight:1.42, krw:40900000000000, sector:"빅테크",
-    coHeld:[
-      { name:"마이크로소프트", trend:[true, true,  true]  },
-      { name:"아마존",         trend:[true, true,  true]  },
-      { name:"구글",           trend:[true, false, true]  },
-    ]},
-  { name:"삼성바이오로직스",    ticker:"207940", market:"코스피", type:"DECREASED", changePct:-11.3, weight:0.24, krw:6900000000000,  sector:"바이오",
-    coHeld:[
-      { name:"셀트리온",  trend:[true, true, true]  },
-      { name:"한미약품",  trend:[true, true, true]  },
-      { name:"유한양행",  trend:[true, true, false] },
-    ]},
-  { name:"POSCO홀딩스",        ticker:"005490", market:"코스피", type:"DECREASED", changePct:-6.5,  weight:0.18, krw:5200000000000,  sector:"소재",
-    coHeld:[
-      { name:"현대제철", trend:[true, true, true]  },
-      { name:"고려아연",  trend:[true, true, true]  },
-    ]},
-  { name:"인텔",               ticker:"INTC",   market:"나스닥", type:"DECREASED", changePct:-15.2, weight:0.09, krw:2600000000000,  sector:"반도체",
-    coHeld:[
-      { name:"AMD",    trend:[true, true,  true]  },
-      { name:"퀄컴",   trend:[true, true,  false] },
-      { name:"마이크론", trend:[true, false, true] },
-    ]},
-  { name:"기아",               ticker:"000270", market:"코스피", type:"SOLD",      changePct:-100,  weight:0,    krw:0,              sector:"자동차",    coHeld:[] },
-  { name:"Pinterest",          ticker:"PINS",   market:"뉴욕",   type:"SOLD",      changePct:-100,  weight:0,    krw:0,              sector:"소셜미디어", coHeld:[] },
-  { name:"화이자",             ticker:"PFE",    market:"뉴욕",   type:"SOLD",      changePct:-100,  weight:0,    krw:0,              sector:"바이오",    coHeld:[] },
-];
-
-const PORTFOLIO_DATA = [
-  { name:"삼성전자",          ticker:"005930", market:"코스피", weight:2.85, krw:82000000000000,  type:"HOLD",      changePct:0,     sector:"반도체",    color:"#DCFCE7", tc:"#15803D" },
-  { name:"애플",              ticker:"AAPL",   market:"나스닥", weight:1.42, krw:40900000000000,  type:"DECREASED", changePct:-8.2,  sector:"빅테크",    color:"#FFF7ED", tc:"#9A3412" },
-  { name:"엔비디아",          ticker:"NVDA",   market:"나스닥", weight:1.18, krw:34000000000000,  type:"INCREASED", changePct:18.3,  sector:"반도체",    color:"#DBEAFE", tc:"#1E40AF" },
-  { name:"마이크로소프트",     ticker:"MSFT",   market:"나스닥", weight:0.98, krw:28200000000000,  type:"HOLD",      changePct:0,     sector:"빅테크",    color:"#F8F9FA", tc:"#6B7280" },
-  { name:"아마존",            ticker:"AMZN",   market:"나스닥", weight:0.76, krw:21900000000000,  type:"INCREASED", changePct:6.1,   sector:"빅테크",    color:"#DBEAFE", tc:"#1E40AF" },
-  { name:"SK하이닉스",        ticker:"000660", market:"코스피", weight:0.68, krw:19600000000000,  type:"HOLD",      changePct:0,     sector:"반도체",    color:"#F8F9FA", tc:"#6B7280" },
-  { name:"알파벳",            ticker:"GOOGL",  market:"나스닥", weight:0.62, krw:17800000000000,  type:"HOLD",      changePct:2.1,   sector:"빅테크",    color:"#F8F9FA", tc:"#6B7280" },
-  { name:"메타",              ticker:"META",   market:"나스닥", weight:0.52, krw:15000000000000,  type:"INCREASED", changePct:12.0,  sector:"빅테크",    color:"#DBEAFE", tc:"#1E40AF" },
-  { name:"한화에어로스페이스", ticker:"012450", market:"코스피", weight:0.31, krw:8900000000000,   type:"INCREASED", changePct:14.1,  sector:"방산",      color:"#DBEAFE", tc:"#1E40AF" },
-  { name:"LG에너지솔루션",    ticker:"373220", market:"코스피", weight:0.45, krw:13000000000000,  type:"HOLD",      changePct:-1.2,  sector:"2차전지",   color:"#F8F9FA", tc:"#6B7280" },
-  { name:"테슬라",            ticker:"TSLA",   market:"나스닥", weight:0.38, krw:10900000000000,  type:"HOLD",      changePct:-3.1,  sector:"자동차/EV", color:"#F8F9FA", tc:"#6B7280" },
-  { name:"TSMC",              ticker:"TSM",    market:"뉴욕",   weight:0.35, krw:10100000000000,  type:"HOLD",      changePct:4.5,   sector:"반도체",    color:"#F8F9FA", tc:"#6B7280" },
-  { name:"삼성바이오로직스",   ticker:"207940", market:"코스피", weight:0.24, krw:6900000000000,   type:"DECREASED", changePct:-11.3, sector:"바이오",    color:"#FFF7ED", tc:"#9A3412" },
-  { name:"브로드컴",          ticker:"AVGO",   market:"나스닥", weight:0.22, krw:6300000000000,   type:"HOLD",      changePct:2.8,   sector:"반도체",    color:"#F8F9FA", tc:"#6B7280" },
-  { name:"JP모건",            ticker:"JPM",    market:"뉴욕",   weight:0.19, krw:5500000000000,   type:"HOLD",      changePct:1.5,   sector:"금융",      color:"#FEF3C7", tc:"#92400E" },
-  { name:"POSCO홀딩스",       ticker:"005490", market:"코스피", weight:0.18, krw:5200000000000,   type:"DECREASED", changePct:-6.5,  sector:"소재",      color:"#FFF7ED", tc:"#9A3412" },
-  { name:"팔란티어",          ticker:"PLTR",   market:"나스닥", weight:0.14, krw:4000000000000,   type:"INCREASED", changePct:9.4,   sector:"AI/테크",   color:"#DBEAFE", tc:"#1E40AF" },
-  { name:"유나이티드헬스",     ticker:"UNH",    market:"뉴욕",   weight:0.13, krw:3800000000000,   type:"HOLD",      changePct:0,     sector:"헬스케어",  color:"#DCFCE7", tc:"#15803D" },
-  { name:"엘라이릴리",        ticker:"LLY",    market:"뉴욕",   weight:0.12, krw:3500000000000,   type:"HOLD",      changePct:3.2,   sector:"바이오",    color:"#DCFCE7", tc:"#15803D" },
-  { name:"비자",              ticker:"V",      market:"뉴욕",   weight:0.11, krw:3200000000000,   type:"HOLD",      changePct:1.1,   sector:"금융",      color:"#FEF3C7", tc:"#92400E" },
-];
-
-const SECTOR_DATA = [
-  { name:"반도체 / AI",      icon:"💾", tint:"#EFF6FF", pct:24.2, stocks:["삼성전자","엔비디아","SK하이닉스","TSMC","브로드컴","AMD"] },
-  { name:"빅테크",           icon:"💻", tint:"#F0F9FF", pct:18.1, stocks:["애플","마이크로소프트","아마존","알파벳","메타"] },
-  { name:"금융",             icon:"🏦", tint:"#FFFBEB", pct:9.4,  stocks:["JP모건","KB금융","삼성생명","신한지주","골드만삭스"] },
-  { name:"바이오 / 헬스케어", icon:"💊", tint:"#F0FDF4", pct:7.8,  stocks:["삼성바이오로직스","셀트리온","유나이티드헬스","엘라이릴리","한미약품"] },
-  { name:"방산 / 항공우주",   icon:"🚀", tint:"#FFF1F2", pct:5.3,  stocks:["한화에어로스페이스","LIG넥스원","RTX","록히드마틴"] },
-  { name:"2차전지 / EV",     icon:"🔋", tint:"#ECFDF5", pct:4.9,  stocks:["LG에너지솔루션","테슬라","LG화학","삼성SDI"] },
-  { name:"AI / 소프트웨어",   icon:"🤖", tint:"#EEF2FF", pct:4.2,  stocks:["팔란티어","AppLovin","세일즈포스","ServiceNow"] },
-  { name:"소재 / 에너지",     icon:"⚗️",  tint:"#FFF7ED", pct:3.8,  stocks:["POSCO홀딩스","고려아연","엑슨모빌","쉐브론"] },
-];
-
-// 섹터 → 칩 색상
-const SECTOR_CHIP_COLORS = {
-  "반도체": { bg:"#DBEAFE", color:"#1E40AF" },
-  "빅테크":  { bg:"#E0F2FE", color:"#0369A1" },
-  "바이오":  { bg:"#DCFCE7", color:"#15803D" },
-  "금융":    { bg:"#FEF3C7", color:"#92400E" },
-  "방산":    { bg:"#FEE2E2", color:"#DC2626" },
-  "AI/테크": { bg:"#EEF2FF", color:"#4338CA" },
-  "소재":    { bg:"#FFF7ED", color:"#9A3412" },
-  "조선/해운":{ bg:"#F0F9FF", color:"#0369A1" },
-  "소셜미디어":{ bg:"#FDF4FF", color:"#7E22CE" },
-  "자동차":  { bg:"#F1F5F9", color:"#475569" },
-  "건설":    { bg:"#F8FAFC", color:"#64748B" },
+// ── 회사명 매핑 (SEC 13F 원본명 → 표시명/티커/섹터) ──────────────
+const CM = {
+  "NVIDIA CORP":                             { d:"엔비디아",           t:"NVDA",  m:"나스닥", s:"반도체/AI" },
+  "NVIDIA CORPORATION":                      { d:"엔비디아",           t:"NVDA",  m:"나스닥", s:"반도체/AI" },
+  "APPLE INC":                               { d:"애플",               t:"AAPL",  m:"나스닥", s:"빅테크" },
+  "MICROSOFT CORP":                          { d:"마이크로소프트",     t:"MSFT",  m:"나스닥", s:"빅테크" },
+  "AMAZON COM INC":                          { d:"아마존",             t:"AMZN",  m:"나스닥", s:"빅테크" },
+  "AMAZON.COM INC":                          { d:"아마존",             t:"AMZN",  m:"나스닥", s:"빅테크" },
+  "ALPHABET INC-CL A":                       { d:"알파벳",             t:"GOOGL", m:"나스닥", s:"빅테크" },
+  "ALPHABET INC-CL C":                       { d:"알파벳 C",           t:"GOOG",  m:"나스닥", s:"빅테크" },
+  "META PLATFORMS INC-CLASS A":              { d:"메타",               t:"META",  m:"나스닥", s:"빅테크" },
+  "META PLATFORMS INC":                      { d:"메타",               t:"META",  m:"나스닥", s:"빅테크" },
+  "TESLA INC":                               { d:"테슬라",             t:"TSLA",  m:"나스닥", s:"자동차/EV" },
+  "BROADCOM INC":                            { d:"브로드컴",           t:"AVGO",  m:"나스닥", s:"반도체/AI" },
+  "TAIWAN SEMICONDUCTOR MFG":                { d:"TSMC",               t:"TSM",   m:"뉴욕",   s:"반도체/AI" },
+  "TAIWAN SEMICONDUCTOR MANUFACTURING CO LTD":{ d:"TSMC",             t:"TSM",   m:"뉴욕",   s:"반도체/AI" },
+  "JPMORGAN CHASE & CO":                     { d:"JP모건",             t:"JPM",   m:"뉴욕",   s:"금융" },
+  "UNITEDHEALTH GROUP INC":                  { d:"유나이티드헬스",     t:"UNH",   m:"뉴욕",   s:"헬스케어" },
+  "VISA INC-CLASS A SHARES":                 { d:"비자",               t:"V",     m:"뉴욕",   s:"금융" },
+  "MASTERCARD INC - A":                      { d:"마스터카드",         t:"MA",    m:"뉴욕",   s:"금융" },
+  "ELI LILLY & CO":                          { d:"일라이릴리",         t:"LLY",   m:"뉴욕",   s:"바이오" },
+  "JOHNSON & JOHNSON":                       { d:"J&J",                t:"JNJ",   m:"뉴욕",   s:"헬스케어" },
+  "EXXON MOBIL CORP":                        { d:"엑슨모빌",           t:"XOM",   m:"뉴욕",   s:"에너지" },
+  "PROCTER & GAMBLE CO/THE":                 { d:"P&G",                t:"PG",    m:"뉴욕",   s:"소비재" },
+  "BERKSHIRE HATHAWAY INC-CL B":             { d:"버크셔B",            t:"BRK.B", m:"뉴욕",   s:"금융" },
+  "ADVANCED MICRO DEVICES":                  { d:"AMD",                t:"AMD",   m:"나스닥", s:"반도체/AI" },
+  "QUALCOMM INC":                            { d:"퀄컴",               t:"QCOM",  m:"나스닥", s:"반도체/AI" },
+  "MICRON TECHNOLOGY INC":                   { d:"마이크론",           t:"MU",    m:"나스닥", s:"반도체/AI" },
+  "APPLIED MATERIALS INC":                   { d:"어플라이드",         t:"AMAT",  m:"나스닥", s:"반도체/AI" },
+  "LAM RESEARCH CORP":                       { d:"램리서치",           t:"LRCX",  m:"나스닥", s:"반도체/AI" },
+  "KLA CORP":                                { d:"KLA",                t:"KLAC",  m:"나스닥", s:"반도체/AI" },
+  "INTEL CORP":                              { d:"인텔",               t:"INTC",  m:"나스닥", s:"반도체/AI" },
+  "PALANTIR TECHNOLOGIES INC-A":             { d:"팔란티어",           t:"PLTR",  m:"나스닥", s:"AI/소프트웨어" },
+  "PALANTIR TECHNOLOGIES":                   { d:"팔란티어",           t:"PLTR",  m:"나스닥", s:"AI/소프트웨어" },
+  "APPLOVIN CORP-CLASS A":                   { d:"AppLovin",           t:"APP",   m:"나스닥", s:"AI/소프트웨어" },
+  "APPLOVIN CORP":                           { d:"AppLovin",           t:"APP",   m:"나스닥", s:"AI/소프트웨어" },
+  "SERVICENOW INC":                          { d:"ServiceNow",         t:"NOW",   m:"뉴욕",   s:"AI/소프트웨어" },
+  "SALESFORCE INC":                          { d:"세일즈포스",         t:"CRM",   m:"뉴욕",   s:"AI/소프트웨어" },
+  "ORACLE CORP":                             { d:"오라클",             t:"ORCL",  m:"뉴욕",   s:"AI/소프트웨어" },
+  "ADOBE INC":                               { d:"어도비",             t:"ADBE",  m:"나스닥", s:"AI/소프트웨어" },
+  "DATADOG INC - CLASS A":                   { d:"데이터독",           t:"DDOG",  m:"나스닥", s:"AI/소프트웨어" },
+  "SNOWFLAKE INC":                           { d:"스노우플레이크",     t:"SNOW",  m:"뉴욕",   s:"AI/소프트웨어" },
+  "CROWDSTRIKE HOLDINGS INC-A":              { d:"크라우드스트라이크", t:"CRWD",  m:"나스닥", s:"AI/소프트웨어" },
+  "PALO ALTO NETWORKS INC":                  { d:"팔로알토",           t:"PANW",  m:"나스닥", s:"AI/소프트웨어" },
+  "NETFLIX INC":                             { d:"넷플릭스",           t:"NFLX",  m:"나스닥", s:"미디어" },
+  "PINTEREST INC- CLASS A":                  { d:"Pinterest",          t:"PINS",  m:"뉴욕",   s:"소셜미디어" },
+  "REDDIT INC - CLASS A":                    { d:"Reddit",             t:"RDDT",  m:"뉴욕",   s:"소셜미디어" },
+  "GOLDMAN SACHS GROUP INC":                 { d:"골드만삭스",         t:"GS",    m:"뉴욕",   s:"금융" },
+  "BANK OF AMERICA CORP":                    { d:"뱅크오브아메리카",   t:"BAC",   m:"뉴욕",   s:"금융" },
+  "WELLS FARGO & CO":                        { d:"웰스파고",           t:"WFC",   m:"뉴욕",   s:"금융" },
+  "MORGAN STANLEY":                          { d:"모건스탠리",         t:"MS",    m:"뉴욕",   s:"금융" },
+  "BLACKROCK INC":                           { d:"블랙록",             t:"BLK",   m:"뉴욕",   s:"금융" },
+  "CHEVRON CORP":                            { d:"쉐브론",             t:"CVX",   m:"뉴욕",   s:"에너지" },
+  "ABBOTT LABORATORIES":                     { d:"애보트",             t:"ABT",   m:"뉴욕",   s:"헬스케어" },
+  "PFIZER INC":                              { d:"화이자",             t:"PFE",   m:"뉴욕",   s:"바이오" },
+  "MERCK & CO INC":                          { d:"머크",               t:"MRK",   m:"뉴욕",   s:"바이오" },
+  "ABBVIE INC":                              { d:"애브비",             t:"ABBV",  m:"뉴욕",   s:"바이오" },
+  "AMGEN INC":                               { d:"암젠",               t:"AMGN",  m:"나스닥", s:"바이오" },
+  "GILEAD SCIENCES INC":                     { d:"길리어드",           t:"GILD",  m:"나스닥", s:"바이오" },
+  "REGENERON PHARMACEUTICALS":               { d:"리제네론",           t:"REGN",  m:"나스닥", s:"바이오" },
+  "MODERNA INC":                             { d:"모더나",             t:"MRNA",  m:"나스닥", s:"바이오" },
+  "INTUITIVE SURGICAL INC":                  { d:"인튜이티브서지컬",   t:"ISRG",  m:"나스닥", s:"헬스케어" },
+  "LOCKHEED MARTIN CORP":                    { d:"록히드마틴",         t:"LMT",   m:"뉴욕",   s:"방산" },
+  "RTX CORP":                                { d:"RTX",                t:"RTX",   m:"뉴욕",   s:"방산" },
+  "NORTHROP GRUMMAN CORP":                   { d:"노스럽그루먼",       t:"NOC",   m:"뉴욕",   s:"방산" },
+  "GENERAL DYNAMICS CORP":                   { d:"제너럴다이나믹스",   t:"GD",    m:"뉴욕",   s:"방산" },
+  "UBER TECHNOLOGIES INC":                   { d:"우버",               t:"UBER",  m:"뉴욕",   s:"소비재" },
+  "AIRBNB INC - CLASS A":                    { d:"에어비앤비",         t:"ABNB",  m:"나스닥", s:"소비재" },
+  "BOOKING HOLDINGS INC":                    { d:"부킹홀딩스",         t:"BKNG",  m:"나스닥", s:"소비재" },
+  "WALMART INC":                             { d:"월마트",             t:"WMT",   m:"뉴욕",   s:"소비재" },
+  "COSTCO WHOLESALE CORP":                   { d:"코스트코",           t:"COST",  m:"나스닥", s:"소비재" },
+  "HOME DEPOT INC":                          { d:"홈디포",             t:"HD",    m:"뉴욕",   s:"소비재" },
+  "COINBASE GLOBAL INC -CLASS A":            { d:"코인베이스",         t:"COIN",  m:"나스닥", s:"기타" },
 };
 
-// ── 유틸 ──────────────────────────────────────────────────────────
+const SECTOR_META = {
+  "반도체/AI":     { icon:"💾", tint:"#EFF6FF" },
+  "빅테크":        { icon:"💻", tint:"#F0F9FF" },
+  "AI/소프트웨어": { icon:"🤖", tint:"#EEF2FF" },
+  "금융":          { icon:"🏦", tint:"#FFFBEB" },
+  "바이오":        { icon:"💊", tint:"#F0FDF4" },
+  "헬스케어":      { icon:"🏥", tint:"#ECFDF5" },
+  "방산":          { icon:"🚀", tint:"#FFF1F2" },
+  "자동차/EV":     { icon:"🚗", tint:"#ECFDF5" },
+  "에너지":        { icon:"⚡", tint:"#FFF7ED" },
+  "소비재":        { icon:"🛒", tint:"#F8FAFC" },
+  "미디어":        { icon:"🎬", tint:"#FDF4FF" },
+  "소셜미디어":    { icon:"📱", tint:"#FDF4FF" },
+  "기타":          { icon:"📊", tint:"#F8F9FA" },
+};
+
+const TYPE_META = {
+  NEW:       { label:'신규 편입', badgeClass:'badge-new',  badgeBg:'#DCFCE7', badgeTc:'#15803D', desc: c => `직전 분기에 없던 종목이에요.` },
+  INCREASED: { label:'비중 확대', badgeClass:'badge-inc',  badgeBg:'#DBEAFE', badgeTc:'#1E40AF', desc: c => `직전 분기 대비 +${(c.changePct||0).toFixed(1)}% 확대했어요.` },
+  DECREASED: { label:'비중 축소', badgeClass:'badge-dec',  badgeBg:'#FFF7ED', badgeTc:'#9A3412', desc: c => `직전 분기 대비 ${(c.changePct||0).toFixed(1)}% 축소했어요.` },
+  SOLD:      { label:'전량 청산', badgeClass:'badge-sold', badgeBg:'#FEE2E2', badgeTc:'#DC2626', desc: c => `이번 분기 전량 매도했어요.` },
+  HOLD:      { label:'유지',      badgeClass:'badge-hold', badgeBg:'#F2F4F6', badgeTc:'#4E5968', desc: c => `` },
+};
+
+// ── State ─────────────────────────────────────────────────────────
+let usData = null, krData = null;
+let chgFilter = 'all';
+let sortFilter = 'weight';
+let curStock = null;
+
+// ── Utilities ─────────────────────────────────────────────────────
 function fmt(v) {
   if (v >= 1e15) return (v/1e15).toFixed(0)+"경원";
   if (v >= 1e12) return (v/1e12).toFixed(1)+"조원";
   if (v >= 1e8)  return Math.round(v/1e8)+"억원";
   return v.toLocaleString()+"원";
+}
+
+function lookup(rawName) {
+  if (!rawName) return { d:'-', t:'', m:'해외', s:'기타' };
+  const exact = CM[rawName];
+  if (exact) return exact;
+  const up = rawName.toUpperCase();
+  for (const [k, v] of Object.entries(CM)) {
+    if (up.startsWith(k.slice(0, 14))) return v;
+  }
+  const cleaned = rawName.split(' ').slice(0,3).map(w => w.charAt(0)+w.slice(1).toLowerCase()).join(' ');
+  return { d:cleaned, t:'', m:'해외', s:'기타' };
+}
+
+function setText(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+
+function getQuarterLabel(dateStr) {
+  if (!dateStr) return '-';
+  const year = dateStr.slice(0,4);
+  const month = parseInt(dateStr.slice(5,7) || dateStr.slice(4,6));
+  return `${year} Q${Math.ceil(month/3)}`;
 }
 
 function switchTab(name) {
@@ -610,30 +522,148 @@ function toast(msg) {
 }
 
 function shareText(title, text) {
-  if (navigator.share) {
-    navigator.share({ title, text }).catch(()=>{});
-  } else if (navigator.clipboard) {
-    navigator.clipboard.writeText(text).then(() => toast('복사됐어요 📋'));
-  }
+  if (navigator.share) { navigator.share({ title, text }).catch(()=>{}); }
+  else if (navigator.clipboard) { navigator.clipboard.writeText(text).then(() => toast('복사됐어요 📋')); }
 }
 
 function shareApp() {
-  shareText(
-    '국민연금 뭐샀지',
-    `국민연금 포트폴리오 생각보다 재밌네\n\n국민연금 공시 기반 포트폴리오 탐색 📊\n국민연금 뭐샀지`
-  );
+  shareText('국민연금 뭐샀지', `국민연금 포트폴리오 생각보다 재밌네\n\n국민연금 공시 기반 포트폴리오 탐색 📊\n국민연금 뭐샀지`);
+}
+
+// ── 데이터 로딩 ───────────────────────────────────────────────────
+async function loadAllData() {
+  try {
+    const [usRes, krRes] = await Promise.allSettled([
+      fetch(`${API_BASE}/api/us-holdings`),
+      fetch(`${API_BASE}/api/kr-holdings`),
+    ]);
+    if (usRes.status === 'fulfilled' && usRes.value.ok) usData = await usRes.value.json();
+    if (krRes.status === 'fulfilled' && krRes.value.ok) krData = await krRes.value.json();
+  } catch(e) { console.error('로딩 실패:', e); }
+  renderAll();
+}
+
+function renderAll() {
+  renderHero();
+  loadRate();
+  renderHomeChangeSummary();
+  renderTopHoldings();
+  renderTopGainers();
+  renderChanges();
+  renderPortfolio();
+  renderSectors();
+}
+
+// ── 환율 ──────────────────────────────────────────────────────────
+async function loadRate() {
+  try {
+    let rate = usData?.exchangeRate;
+    let date = usData?.filingDate;
+    if (!rate) {
+      const res = await fetch(`${API_BASE}/api/exchange-rate`);
+      const d = await res.json();
+      rate = d.rate; date = d.date;
+    }
+    document.getElementById('rate-value').textContent = `${Math.round(rate).toLocaleString()}원`;
+    document.getElementById('rate-date').textContent = date ? `${date} 기준` : '';
+    document.getElementById('rate-dot').classList.remove('loading');
+  } catch { document.getElementById('rate-value').textContent = '조회 실패'; }
+}
+
+// ── Hero ──────────────────────────────────────────────────────────
+function renderHero() {
+  if (!usData) return;
+  const totalKrw = usData.totalValueUsd * (usData.exchangeRate || 1350);
+  const newCount = usData.holdings.filter(h => h.changeType === 'NEW').length;
+  const soldCount = (usData.sold || []).length;
+  setText('hero-total', fmt(totalKrw));
+  setText('hero-quarter', `${getQuarterLabel(usData.prevFilingDate)} → ${getQuarterLabel(usData.filingDate)}`);
+  setText('hero-count', `${usData.count}개`);
+  setText('hero-new', `신규 ${newCount}개`);
+  setText('hero-sold', `청산 ${soldCount}개`);
+  setText('kpi-new', `${newCount}개`);
+  setText('kpi-sold', `${soldCount}개`);
+}
+
+// ── 홈: 변화 요약 ─────────────────────────────────────────────────
+function renderHomeChangeSummary() {
+  if (!usData) return;
+  const newItems = usData.holdings.filter(h => h.changeType === 'NEW');
+  const incItems = usData.holdings.filter(h => h.changeType === 'INCREASED').sort((a,b) => (b.changePct||0)-(a.changePct||0));
+  const decItems = usData.holdings.filter(h => h.changeType === 'DECREASED').sort((a,b) => (a.changePct||0)-(b.changePct||0));
+  const soldItems = usData.sold || [];
+
+  const card = (type, items, badgeClass, label) => {
+    const top2 = items.slice(0,2).map(h => lookup(h.name).d);
+    const more = items.length - 2;
+    return `
+      <div class="chg-sum-card" onclick="switchTab('changes');setChgFilter('${type}',document.querySelector('[data-filter=${type}]'))">
+        <span class="chg-sum-badge ${badgeClass}">${label}</span>
+        ${top2.map(n => `<div class="chg-sum-item">${n}</div>`).join('')}
+        ${more > 0 ? `<div class="chg-sum-more">+${more}개 →</div>` : ''}
+      </div>`;
+  };
+
+  document.getElementById('home-chg-summary').innerHTML =
+    card('NEW', newItems, 'badge-new', '신규 편입') +
+    card('INCREASED', incItems, 'badge-inc', '비중 확대') +
+    card('DECREASED', decItems, 'badge-dec', '비중 축소') +
+    card('SOLD', soldItems, 'badge-sold', '청산');
+}
+
+// ── 홈: TOP 5 ────────────────────────────────────────────────────
+function renderTopHoldings() {
+  if (!usData) return;
+  const top5 = usData.holdings.slice(0,5);
+  document.getElementById('home-holdings').innerHTML = `
+    <div class="holding-list">
+      ${top5.map((h,i) => {
+        const info = lookup(h.name);
+        return `
+          <div class="holding-row" onclick="openStockSheet(${JSON.stringify(info.d)},${JSON.stringify(info.t)},${h.pct},${h.valueKrw},${JSON.stringify(h.changeType)},${h.changePct||0},${JSON.stringify(info.s)})">
+            <div class="holding-rank">${i+1}</div>
+            <div class="holding-info">
+              <div class="holding-name">${info.d}</div>
+              <div class="holding-ticker">${info.t ? info.t+' · ' : ''}${info.m}</div>
+            </div>
+            <div class="holding-right">
+              <div class="holding-pct">${h.pct.toFixed(2)}%</div>
+              <div class="holding-krw">${fmt(h.valueKrw)}</div>
+            </div>
+          </div>`;
+      }).join('')}
+    </div>`;
+}
+
+// ── 홈: 많이 늘린 종목 ────────────────────────────────────────────
+function renderTopGainers() {
+  if (!usData) return;
+  const gainers = usData.holdings
+    .filter(h => h.changeType === 'INCREASED' && (h.changePct||0) > 0)
+    .sort((a,b) => (b.changePct||0)-(a.changePct||0))
+    .slice(0,3);
+  const newOnes = usData.holdings.filter(h => h.changeType === 'NEW').slice(0,1);
+  const items = [...gainers, ...newOnes];
+
+  document.getElementById('home-gainers').innerHTML = `
+    <div class="gain-list">
+      ${items.map(h => {
+        const info = lookup(h.name);
+        if (h.changeType === 'NEW') return `
+          <div class="gain-card" onclick="openStockSheet(${JSON.stringify(info.d)},${JSON.stringify(info.t)},${h.pct},${h.valueKrw},'NEW',0,${JSON.stringify(info.s)})">
+            <div><div class="gain-name">${info.d}${info.t ? ` (${info.t})` : ''}</div><div class="gain-sub">${info.s} · 직전 분기에 없던 종목</div></div>
+            <div class="gain-pct purple">NEW</div>
+          </div>`;
+        return `
+          <div class="gain-card" onclick="openStockSheet(${JSON.stringify(info.d)},${JSON.stringify(info.t)},${h.pct},${h.valueKrw},'INCREASED',${h.changePct||0},${JSON.stringify(info.s)})">
+            <div><div class="gain-name">${info.d}${info.t ? ` (${info.t})` : ''}</div><div class="gain-sub">${info.s} · 비중 확대</div></div>
+            <div><div class="gain-pct">+${(h.changePct||0).toFixed(1)}%</div><div style="font-size:10px;color:#ADB5BD;text-align:right;margin-top:2px;font-weight:600">vs 직전 분기</div></div>
+          </div>`;
+      }).join('')}
+    </div>`;
 }
 
 // ── 변화 탭 ───────────────────────────────────────────────────────
-let chgFilter = 'all';
-const TYPE_META = {
-  NEW:       { label:'신규 편입', badgeClass:'badge-new',  badgeBg:'#DCFCE7', badgeTc:'#15803D', desc: c => `직전 분기에 없던 종목이에요.` },
-  INCREASED: { label:'비중 확대', badgeClass:'badge-inc',  badgeBg:'#DBEAFE', badgeTc:'#1E40AF', desc: c => `직전 분기 대비 +${c.changePct.toFixed(1)}% 확대했어요.` },
-  DECREASED: { label:'비중 축소', badgeClass:'badge-dec',  badgeBg:'#FFF7ED', badgeTc:'#9A3412', desc: c => `직전 분기 대비 ${c.changePct.toFixed(1)}% 축소했어요.` },
-  SOLD:      { label:'전량 청산', badgeClass:'badge-sold', badgeBg:'#FEE2E2', badgeTc:'#DC2626', desc: c => `이번 분기 전량 매도했어요.` },
-  HOLD:      { label:'유지',      badgeClass:'badge-hold', badgeBg:'#F2F4F6', badgeTc:'#4E5968', desc: c => `` },
-};
-
 function setChgFilter(f, btn) {
   chgFilter = f;
   document.querySelectorAll('#tab-changes .filter-btn').forEach(b => b.classList.remove('active'));
@@ -643,37 +673,41 @@ function setChgFilter(f, btn) {
 }
 
 function renderChanges() {
-  const list = chgFilter === 'all' ? CHANGES_DATA : CHANGES_DATA.filter(c => c.type === chgFilter);
-  const el   = document.getElementById('changes-list');
+  if (!usData) return;
+  let list = [
+    ...usData.holdings.filter(h => h.changeType !== 'HOLD'),
+    ...(usData.sold||[]).map(h => ({...h, changeType:'SOLD', changePct:-100, pct:0, valueKrw:0})),
+  ];
+  if (chgFilter !== 'all') list = list.filter(h => h.changeType === chgFilter);
+
+  const el = document.getElementById('changes-list');
   if (!list.length) { el.innerHTML = `<div class="empty-state">해당 유형의 변화가 없어요</div>`; return; }
 
-  el.innerHTML = list.map(c => {
-    const t = TYPE_META[c.type];
-    const stats = c.type !== 'SOLD' ? `
+  el.innerHTML = list.map(h => {
+    const info = lookup(h.name);
+    const t = TYPE_META[h.changeType] || TYPE_META.HOLD;
+    const stats = h.changeType !== 'SOLD' ? `
       <div class="chg-item-stats">
-        <div class="chg-stat"><div class="chg-stat-val">${c.weight.toFixed(2)}%</div><div class="chg-stat-label">현재 비중</div></div>
-        <div class="chg-stat"><div class="chg-stat-val">${fmt(c.krw)}</div><div class="chg-stat-label">보유 금액</div></div>
-        ${c.changePct !== 0 ? `<div class="chg-stat"><div class="chg-stat-val" style="color:${c.changePct>0?'#0BB25F':'#DC2626'}">${c.changePct>0?'+':''}${c.changePct.toFixed(1)}%</div><div class="chg-stat-label">직전 분기 대비</div></div>` : ''}
+        <div class="chg-stat"><div class="chg-stat-val">${h.pct.toFixed(2)}%</div><div class="chg-stat-label">현재 비중</div></div>
+        <div class="chg-stat"><div class="chg-stat-val">${fmt(h.valueKrw)}</div><div class="chg-stat-label">보유 금액</div></div>
+        ${h.changePct && h.changePct !== 0 ? `<div class="chg-stat"><div class="chg-stat-val" style="color:${h.changePct>0?'#0BB25F':'#DC2626'}">${h.changePct>0?'+':''}${h.changePct.toFixed(1)}%</div><div class="chg-stat-label">직전 분기 대비</div></div>` : ''}
       </div>` : '';
-
     return `
-      <div class="chg-item" onclick="openStockSheet('${c.name}','${c.ticker}',${c.weight},${c.krw},'${c.type}',${c.changePct},'${c.sector}')">
+      <div class="chg-item" onclick="openStockSheet(${JSON.stringify(info.d)},${JSON.stringify(info.t)},${h.pct||0},${h.valueKrw||0},${JSON.stringify(h.changeType)},${h.changePct||0},${JSON.stringify(info.s)})">
         <div class="chg-item-top">
           <div>
-            <div class="chg-stock-name">${c.name}</div>
-            <div class="chg-stock-ticker">${c.ticker} · ${c.market}</div>
+            <div class="chg-stock-name">${info.d}</div>
+            <div class="chg-stock-ticker">${info.t ? info.t+' · ' : ''}${info.m}</div>
           </div>
           <span class="chg-sum-badge ${t.badgeClass}">${t.label}</span>
         </div>
-        <div class="chg-item-desc">${t.desc(c)}</div>
+        <div class="chg-item-desc">${t.desc(h)}</div>
         ${stats}
       </div>`;
   }).join('');
 }
 
 // ── 포트폴리오 탭 ─────────────────────────────────────────────────
-let sortFilter = 'weight';
-
 function setSortFilter(f, btn) {
   sortFilter = f;
   document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
@@ -682,27 +716,31 @@ function setSortFilter(f, btn) {
 }
 
 function renderPortfolio() {
-  let data = [...PORTFOLIO_DATA];
-  if (sortFilter === 'amount') data.sort((a,b) => b.krw - a.krw);
-  else if (sortFilter === 'change') data.sort((a,b) => Math.abs(b.changePct) - Math.abs(a.changePct));
+  if (!usData) return;
+  let data = [...usData.holdings];
+  if (sortFilter === 'amount') data.sort((a,b) => b.valueKrw - a.valueKrw);
+  else if (sortFilter === 'change') data.sort((a,b) => Math.abs(b.changePct||0) - Math.abs(a.changePct||0));
+  data = data.slice(0,50);
 
-  document.getElementById('portfolio-list').innerHTML = data.map((h, i) => {
+  document.getElementById('portfolio-list').innerHTML = data.map((h,i) => {
+    const info = lookup(h.name);
     let chgHtml = '';
-    if (h.type === 'NEW')       chgHtml = `<div class="port-chg new">신규</div>`;
-    else if (h.type === 'INCREASED') chgHtml = `<div class="port-chg up">▲ +${h.changePct.toFixed(1)}%</div>`;
-    else if (h.type === 'DECREASED') chgHtml = `<div class="port-chg dn">▼ ${Math.abs(h.changePct).toFixed(1)}%</div>`;
-
+    if (h.changeType==='NEW') chgHtml = `<div class="port-chg new">신규</div>`;
+    else if (h.changeType==='INCREASED') chgHtml = `<div class="port-chg up">▲ +${(h.changePct||0).toFixed(1)}%</div>`;
+    else if (h.changeType==='DECREASED') chgHtml = `<div class="port-chg dn">▼ ${Math.abs(h.changePct||0).toFixed(1)}%</div>`;
+    const bg = h.changeType==='NEW'?'#DCFCE7':h.changeType==='INCREASED'?'#DBEAFE':h.changeType==='DECREASED'?'#FFF7ED':'#F8F9FA';
+    const tc = h.changeType==='NEW'?'#15803D':h.changeType==='INCREASED'?'#1E40AF':h.changeType==='DECREASED'?'#9A3412':'#6B7280';
     return `
-      <div class="port-row" onclick="openStockSheet('${h.name}','${h.ticker}',${h.weight},${h.krw},'${h.type}',${h.changePct},'${h.sector}')">
+      <div class="port-row" onclick="openStockSheet(${JSON.stringify(info.d)},${JSON.stringify(info.t)},${h.pct},${h.valueKrw},${JSON.stringify(h.changeType)},${h.changePct||0},${JSON.stringify(info.s)})">
         <div class="port-rank">${i+1}</div>
-        <div class="port-icon" style="background:${h.color};color:${h.tc}">${h.name[0]}</div>
+        <div class="port-icon" style="background:${bg};color:${tc}">${info.d.charAt(0)}</div>
         <div class="port-info">
-          <div class="port-name">${h.name}</div>
-          <div class="port-ticker">${h.ticker}</div>
+          <div class="port-name">${info.d}</div>
+          <div class="port-ticker">${info.t || info.m}</div>
         </div>
         <div class="port-right">
-          <div class="port-pct">${h.weight.toFixed(2)}%</div>
-          <div class="port-krw">${fmt(h.krw)}</div>
+          <div class="port-pct">${h.pct.toFixed(2)}%</div>
+          <div class="port-krw">${fmt(h.valueKrw)}</div>
           ${chgHtml}
         </div>
       </div>`;
@@ -711,8 +749,19 @@ function renderPortfolio() {
 
 // ── 섹터 탭 ───────────────────────────────────────────────────────
 function renderSectors() {
-  const maxPct = Math.max(...SECTOR_DATA.map(s => s.pct));
-  document.getElementById('sector-list').innerHTML = SECTOR_DATA.map(s => `
+  if (!usData) return;
+  const sectorMap = {};
+  for (const h of usData.holdings) {
+    const s = lookup(h.name).s || '기타';
+    if (!sectorMap[s]) sectorMap[s] = { pct:0, stocks:[] };
+    sectorMap[s].pct += h.pct;
+    if (sectorMap[s].stocks.length < 5) sectorMap[s].stocks.push(lookup(h.name).d);
+  }
+  const sectors = Object.entries(sectorMap)
+    .map(([name, data]) => ({ name, pct:+data.pct.toFixed(1), stocks:data.stocks, ...(SECTOR_META[name]||{icon:'📊',tint:'#F8F9FA'}) }))
+    .sort((a,b) => b.pct-a.pct).slice(0,10);
+  const maxPct = sectors[0]?.pct || 1;
+  document.getElementById('sector-list').innerHTML = sectors.map(s => `
     <div class="sector-card">
       <div class="sector-top">
         <div style="display:flex;align-items:center;gap:10px">
@@ -726,103 +775,39 @@ function renderSectors() {
       </div>
       <div class="sector-bar-bg"><div class="sector-bar" style="width:${(s.pct/maxPct*100).toFixed(0)}%"></div></div>
       <div class="sector-chips">${s.stocks.map(st => `<span class="sector-chip">${st}</span>`).join('')}</div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
 // ── 바텀시트 ──────────────────────────────────────────────────────
-let curStock = null;
-
 function openStockSheet(name, ticker, weight, krw, type, changePct, sector) {
   curStock = { name, ticker, weight, krw, type, changePct, sector };
   const t = TYPE_META[type] || TYPE_META['HOLD'];
-
-  document.getElementById('sh-name').textContent   = name + (ticker !== name ? ` (${ticker})` : '');
+  document.getElementById('sh-name').textContent = name + (ticker && ticker !== name ? ` (${ticker})` : '');
   document.getElementById('sh-weight').textContent = type !== 'SOLD' ? `${weight.toFixed(2)}%` : '청산';
-  document.getElementById('sh-krw').textContent    = type !== 'SOLD' ? fmt(krw) : '-';
-
+  document.getElementById('sh-krw').textContent = type !== 'SOLD' ? fmt(krw) : '-';
   const badge = document.getElementById('sh-badge');
-  badge.textContent       = t.label;
-  badge.style.background  = t.badgeBg;
-  badge.style.color       = t.badgeTc;
+  badge.textContent = t.label; badge.style.background = t.badgeBg; badge.style.color = t.badgeTc;
 
-  const chgData = CHANGES_DATA.find(c => c.ticker === ticker);
-  const portData = PORTFOLIO_DATA.find(p => p.ticker === ticker);
-  const portRank = portData ? PORTFOLIO_DATA.indexOf(portData) + 1 : null;
-  const coHeld   = chgData?.coHeld || [];
-  const secData  = SECTOR_DATA.find(s => s.stocks.includes(name));
-  const chipColor = SECTOR_CHIP_COLORS[sector] || { bg:'#EEF2FF', color:'#4338CA' };
-
+  const secMeta = SECTOR_META[sector] || SECTOR_META['기타'];
   let html = '';
-
-  // 현재 보유
   if (type !== 'SOLD') {
-    html += `
-      <div class="sh-section">
-        <div class="sh-section-title">현재 보유</div>
-        <div class="sh-stat-row">
-          <div class="sh-stat"><div class="sh-stat-val">${weight.toFixed(2)}%</div><div class="sh-stat-label">보유 비중</div></div>
-          <div class="sh-stat"><div class="sh-stat-val">${fmt(krw)}</div><div class="sh-stat-label">보유 금액</div></div>
-          ${portRank ? `<div class="sh-stat"><div class="sh-stat-val">${portRank}위</div><div class="sh-stat-label">전체 순위</div></div>` : ''}
-        </div>
-      </div>`;
+    html += `<div class="sh-section"><div class="sh-section-title">현재 보유</div><div class="sh-stat-row">
+      <div class="sh-stat"><div class="sh-stat-val">${weight.toFixed(2)}%</div><div class="sh-stat-label">보유 비중</div></div>
+      <div class="sh-stat"><div class="sh-stat-val">${fmt(krw)}</div><div class="sh-stat-label">보유 금액</div></div>
+    </div></div>`;
   }
-
-  // 최근 변화
-  html += `
-    <div class="sh-section">
-      <div class="sh-section-title">직전 분기 대비 변화</div>
-      <div class="sh-change-row">
-        <div class="sh-change-label">변화 유형</div>
-        <div class="sh-change-val" style="color:${t.badgeTc}">${t.label}</div>
-      </div>
-      ${changePct !== 0 ? `
-      <div class="sh-change-row">
-        <div class="sh-change-label">변화율</div>
-        <div class="sh-change-val" style="color:${changePct>0?'#0BB25F':'#DC2626'}">${changePct>0?'+':''}${changePct.toFixed(1)}%</div>
-      </div>` : ''}
-      <div class="sh-change-row">
-        <div class="sh-change-label">비교 기준</div>
-        <div class="sh-change-val" style="color:#6B7280">2025 Q4 → 2026 Q1</div>
-      </div>
-    </div>`;
-
-  // 같이 보유한 종목 — 분기별 추세
-  if (coHeld.length > 0) {
-    const chipC = SECTOR_CHIP_COLORS[sector] || { bg:'#EEF2FF', color:'#4338CA' };
-    html += `
-      <div class="sh-section">
-        <div class="sh-section-title">같이 보유한 종목</div>
-        <div class="trend-header">
-          <span class="trend-q-label">Q3</span>
-          <span class="trend-q-label">Q4</span>
-          <span class="trend-q-label">Q1</span>
-        </div>
-        ${coHeld.map(s => `
-          <div class="trend-row">
-            <span class="trend-name" style="color:${chipC.color}">${s.name}</span>
-            <div class="trend-dots">
-              ${s.trend.map(on => `<div class="trend-dot ${on ? 'on' : 'off'}"></div>`).join('')}
-            </div>
-          </div>`).join('')}
-      </div>`;
+  html += `<div class="sh-section"><div class="sh-section-title">직전 분기 대비 변화</div>
+    <div class="sh-change-row"><div class="sh-change-label">변화 유형</div><div class="sh-change-val" style="color:${t.badgeTc}">${t.label}</div></div>
+    ${changePct && changePct !== 0 ? `<div class="sh-change-row"><div class="sh-change-label">변화율</div><div class="sh-change-val" style="color:${changePct>0?'#0BB25F':'#DC2626'}">${changePct>0?'+':''}${changePct.toFixed(1)}%</div></div>` : ''}
+    <div class="sh-change-row"><div class="sh-change-label">데이터 출처</div><div class="sh-change-val" style="color:#6B7280">SEC 13F</div></div>
+  </div>`;
+  if (sector) {
+    html += `<div class="sh-section"><div class="sh-section-title">섹터</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;background:${secMeta.tint}">${secMeta.icon}</div>
+        <div style="font-size:15px;font-weight:800;color:#191F28">${sector}</div>
+      </div></div>`;
   }
-
-  // 섹터
-  if (secData) {
-    html += `
-      <div class="sh-section">
-        <div class="sh-section-title">섹터</div>
-        <div style="display:flex;align-items:center;gap:10px">
-          <div class="sector-icon-wrap" style="background:${secData.tint};width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">${secData.icon}</div>
-          <div>
-            <div style="font-size:15px;font-weight:800;color:#191F28">${secData.name}</div>
-            <div style="font-size:11px;color:#ADB5BD;margin-top:2px">포트 비중 ${secData.pct}%</div>
-          </div>
-        </div>
-      </div>`;
-  }
-
   document.getElementById('sh-content').innerHTML = html;
   document.getElementById('overlay').style.display = 'block';
   setTimeout(() => document.getElementById('stock-sheet').classList.add('open'), 10);
@@ -837,24 +822,21 @@ function shareStock() {
   if (!curStock) return;
   const t = TYPE_META[curStock.type];
   const lines = [
-    `국민연금이 이번 분기 ${t.label}한 종목`,
-    ``,
-    `${curStock.name} (${curStock.ticker})`,
+    `국민연금이 이번 분기 ${t.label}한 종목`, ``,
+    `${curStock.name}${curStock.ticker ? ` (${curStock.ticker})` : ''}`,
     curStock.type !== 'SOLD' ? `보유 비중 ${curStock.weight.toFixed(2)}% · ${fmt(curStock.krw)}` : '이번 분기 전량 매도',
-    curStock.changePct && curStock.changePct !== 0 ? `직전 분기 대비 ${curStock.changePct > 0 ? '+' : ''}${curStock.changePct.toFixed(1)}%` : '',
-    ``,
-    `국민연금 뭐샀지 📊`,
+    curStock.changePct && curStock.changePct !== 0 ? `직전 분기 대비 ${curStock.changePct>0?'+':''}${curStock.changePct.toFixed(1)}%` : '',
+    ``, `국민연금 뭐샀지 📊`,
   ].filter(Boolean).join('\n');
   shareText(`국민연금 ${curStock.name} 보유 현황`, lines);
 }
 
 // ── 초기화 ────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
-  loadRate();
-  renderChanges();
-  renderPortfolio();
-  renderSectors();
+  loadAllData();
 });
+
+
 </script>
 </body>
 </html>
