@@ -263,12 +263,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI',
         <div class="hero-stat-label">미국 보유 종목</div>
       </div>
       <div class="hero-stat">
-        <div class="hero-stat-val" id="hero-new">—</div>
-        <div class="hero-stat-label">신규 편입</div>
+        <div class="hero-stat-val" id="hero-kr-count">—</div>
+        <div class="hero-stat-label">국내 보유 종목</div>
       </div>
       <div class="hero-stat">
-        <div class="hero-stat-val" id="hero-sold">—</div>
-        <div class="hero-stat-label">청산</div>
+        <div class="hero-stat-val" id="hero-new">—</div>
+        <div class="hero-stat-label">신규 편입</div>
       </div>
     </div>
   </div>
@@ -288,14 +288,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI',
   <!-- KPI -->
   <div class="stats-grid">
     <div class="stat-card">
-      <div class="stat-label">신규 편입</div>
+      <div class="stat-label">미국 신규 편입</div>
       <div class="stat-value" id="kpi-new">—</div>
       <div class="stat-sub">전분기 대비</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">청산 종목</div>
-      <div class="stat-value" id="kpi-sold">—</div>
-      <div class="stat-sub red">전량 매도</div>
+      <div class="stat-label">국내 신규 편입</div>
+      <div class="stat-value" id="kpi-kr-new">—</div>
+      <div class="stat-sub">전분기 대비</div>
     </div>
   </div>
 
@@ -622,17 +622,20 @@ async function loadRate() {
 
 // ── Hero ──────────────────────────────────────────────────────────
 function renderHero() {
-  if (!usData) return;
-  const totalKrw = usData.totalValueUsd * (usData.exchangeRate || 1350);
-  const newCount = usData.holdings.filter(h => h.changeType === 'NEW').length;
-  const soldCount = (usData.sold || []).length;
-  setText('hero-total', fmt(totalKrw));
-  setText('hero-quarter', `${getQuarterLabel(usData.prevFilingDate)} → ${getQuarterLabel(usData.filingDate)}`);
-  setText('hero-count', `${usData.count}개`);
-  setText('hero-new', `신규 ${newCount}개`);
-  setText('hero-sold', `청산 ${soldCount}개`);
-  setText('kpi-new', `${newCount}개`);
-  setText('kpi-sold', `${soldCount}개`);
+  if (usData) {
+    const totalKrw = usData.totalValueUsd * (usData.exchangeRate || 1350);
+    const newCount = usData.holdings.filter(h => h.changeType === 'NEW').length;
+    setText('hero-total', fmt(totalKrw));
+    setText('hero-quarter', `${getQuarterLabel(usData.prevFilingDate)} → ${getQuarterLabel(usData.filingDate)}`);
+    setText('hero-count', `${usData.count}개`);
+    setText('hero-new', `신규 ${newCount}개`);
+    setText('kpi-new', `${newCount}개`);
+  }
+  if (krData) {
+    const krNewCount = (krData.holdings || []).filter(h => h.changeType === 'NEW').length;
+    setText('hero-kr-count', `${krData.count}개`);
+    setText('kpi-kr-new', `${krNewCount}개`);
+  }
 }
 
 // ── 홈: 변화 요약 ─────────────────────────────────────────────────
