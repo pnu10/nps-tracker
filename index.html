@@ -679,6 +679,7 @@ function renderTopHoldings() {
             <div class="holding-right">
               <div class="holding-pct">${h.pct.toFixed(2)}%</div>
               <div class="holding-krw">${fmt(h.valueKrw)}</div>
+              <div style="font-size:10px;color:#C9CDD2;margin-top:2px;font-weight:600">탭하면 상세 보기</div>
             </div>
           </div>`;
       }).join('')}
@@ -765,6 +766,7 @@ function renderChanges() {
         </div>
         <div class="chg-item-desc">${t.desc(h)}</div>
         ${stats}
+        <div style="font-size:10px;color:#C9CDD2;margin-top:6px;font-weight:600">탭하면 상세 보기 →</div>
       </div>`;
   }).join('');
 }
@@ -807,7 +809,7 @@ function renderPortfolio() {
       return `<div class="port-row" onclick='openStockSheet(${JSON.stringify(info.d)},${JSON.stringify(info.t)},${h.pct},${h.valueKrw},${JSON.stringify(h.changeType)},${h.changePct||0},${JSON.stringify(info.s)})'>
         <div class="port-rank">${i+1}</div>
         <div class="port-icon" style="background:${bg};color:${tc}">${info.d.charAt(0)}</div>
-        <div class="port-info"><div class="port-name">${info.d}</div><div class="port-ticker">${info.t || info.m}</div></div>
+        <div class="port-info"><div class="port-name">${info.d}</div><div class="port-ticker">${info.t || info.m} · 탭하면 상세 보기</div></div>
         <div class="port-right"><div class="port-pct">${h.pct.toFixed(2)}%</div><div class="port-krw">${fmt(h.valueKrw)}</div>${chgHtml}</div>
       </div>`;
     }).join('');
@@ -829,7 +831,7 @@ function renderPortfolio() {
         return `<div class="port-row" onclick='openKrStockSheet(${JSON.stringify(h)})'>
           <div class="port-rank">${i+1}</div>
           <div class="port-icon" style="background:${bg};color:${tc}">${h.corp_name.charAt(0)}</div>
-          <div class="port-info"><div class="port-name">${h.corp_name}</div><div class="port-ticker">코스피 · ${h.rcept_dt.slice(0,10).replace(/-/g,'.')} 공시</div></div>
+          <div class="port-info"><div class="port-name">${h.corp_name}</div><div class="port-ticker">코스피 · ${h.rcept_dt.slice(0,10).replace(/-/g,'.')} · 탭하면 상세 보기</div></div>
           <div class="port-right"><div class="port-pct">${h.pct.toFixed(2)}%</div><div class="port-krw" style="color:#ADB5BD">회사 지분율</div>${chgHtml}</div>
         </div>`;
       }).join('');
