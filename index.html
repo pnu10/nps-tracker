@@ -349,6 +349,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI',
     <span style="font-size:12px;font-weight:700;color:#4E5968">현재 보유 현황</span>
     <span style="font-size:11px;font-weight:700;color:#ADB5BD">2026 Q1 공시 기준</span>
   </div>
+  <div class="filter-row" style="padding-top:8px">
+    <button class="filter-btn active" data-market="all"  onclick="setMarketFilter('all',this)">전체</button>
+    <button class="filter-btn"        data-market="us"   onclick="setMarketFilter('us',this)">🇺🇸 미국</button>
+    <button class="filter-btn"        data-market="kr"   onclick="setMarketFilter('kr',this)">🇰🇷 국내</button>
+  </div>
   <div class="sort-row">
     <button class="sort-btn active" onclick="setSortFilter('weight',this)">비중순</button>
     <button class="sort-btn" onclick="setSortFilter('amount',this)">금액순</button>
@@ -510,6 +515,7 @@ const TYPE_META = {
 let usData = null, krData = null;
 let chgFilter = 'all';
 let sortFilter = 'weight';
+let marketFilter = 'all';
 let curStock = null;
 
 // ── Utilities ─────────────────────────────────────────────────────
@@ -552,8 +558,10 @@ function switchTab(name) {
   // 탭 전환 시 검색창 초기화
   const cs = document.getElementById('changes-search');
   const ps = document.getElementById('portfolio-search');
-  if (cs) { cs.value = ''; renderChanges(); }
-  if (ps) { ps.value = ''; renderPortfolio(); }
+  if (cs) { cs.value = ''; }
+  if (ps) { ps.value = ''; }
+  if (name === 'changes') renderChanges();
+  if (name === 'portfolio') renderPortfolio();
 }
 
 function toast(msg) {
@@ -759,6 +767,13 @@ function renderChanges() {
 }
 
 // ── 포트폴리오 탭 ─────────────────────────────────────────────────
+function setMarketFilter(f, btn) {
+  marketFilter = f;
+  document.querySelectorAll('[data-market]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderPortfolio();
+}
+
 function setSortFilter(f, btn) {
   sortFilter = f;
   document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
@@ -769,78 +784,59 @@ function setSortFilter(f, btn) {
 function renderPortfolio() {
   if (!usData && !krData) return;
   const q = (document.getElementById('portfolio-search')?.value || '').toLowerCase();
-  let data = [...usData.holdings];
-  if (q) data = data.filter(h => {
-    const info = lookup(h.name);
-    return info.d.toLowerCase().includes(q) || (info.t||'').toLowerCase().includes(q);
-  });
-  if (sortFilter === 'amount') data.sort((a,b) => b.valueKrw - a.valueKrw);
-  else if (sortFilter === 'change') data.sort((a,b) => Math.abs(b.changePct||0) - Math.abs(a.changePct||0));
-  data = data.slice(0,50);
+  const el = document.getElementById('portfolio-list');
+  let html = '';
 
-  const usHtml = data.map((h,i) => {
-    const info = lookup(h.name);
-    let chgHtml = '';
-    if (h.changeType==='NEW') chgHtml = `<div class="port-chg new">신규</div>`;
-    else if (h.changeType==='INCREASED') chgHtml = `<div class="port-chg up">▲ +${(h.changePct||0).toFixed(1)}%</div>`;
-    else if (h.changeType==='DECREASED') chgHtml = `<div class="port-chg dn">▼ ${Math.abs(h.changePct||0).toFixed(1)}%</div>`;
-    const bg = h.changeType==='NEW'?'#DCFCE7':h.changeType==='INCREASED'?'#DBEAFE':h.changeType==='DECREASED'?'#FFF7ED':'#F8F9FA';
-    const tc = h.changeType==='NEW'?'#15803D':h.changeType==='INCREASED'?'#1E40AF':h.changeType==='DECREASED'?'#9A3412':'#6B7280';
-    return `
-      <div class="port-row" onclick="openStockSheet(${JSON.stringify(info.d)},${JSON.stringify(info.t)},${h.pct},${h.valueKrw},${JSON.stringify(h.changeType)},${h.changePct||0},${JSON.stringify(info.s)})">
+  // ── 미국 주식 ──
+  if (marketFilter !== 'kr' && usData) {
+    let data = [...usData.holdings];
+    if (q) data = data.filter(h => { const info = lookup(h.name); return info.d.toLowerCase().includes(q) || (info.t||'').toLowerCase().includes(q); });
+    if (sortFilter === 'amount') data.sort((a,b) => b.valueKrw - a.valueKrw);
+    else if (sortFilter === 'change') data.sort((a,b) => Math.abs(b.changePct||0) - Math.abs(a.changePct||0));
+    data = data.slice(0, 30);
+    const rows = data.map((h,i) => {
+      const info = lookup(h.name);
+      const chgHtml = h.changeType==='NEW' ? `<div class="port-chg new">신규</div>`
+        : h.changeType==='INCREASED' ? `<div class="port-chg up">▲ +${(h.changePct||0).toFixed(1)}%</div>`
+        : h.changeType==='DECREASED' ? `<div class="port-chg dn">▼ ${Math.abs(h.changePct||0).toFixed(1)}%</div>` : '';
+      const bg = h.changeType==='NEW'?'#DCFCE7':h.changeType==='INCREASED'?'#DBEAFE':h.changeType==='DECREASED'?'#FFF7ED':'#F8F9FA';
+      const tc = h.changeType==='NEW'?'#15803D':h.changeType==='INCREASED'?'#1E40AF':h.changeType==='DECREASED'?'#9A3412':'#6B7280';
+      return `<div class="port-row" onclick="openStockSheet(${JSON.stringify(info.d)},${JSON.stringify(info.t)},${h.pct},${h.valueKrw},${JSON.stringify(h.changeType)},${h.changePct||0},${JSON.stringify(info.s)})">
         <div class="port-rank">${i+1}</div>
         <div class="port-icon" style="background:${bg};color:${tc}">${info.d.charAt(0)}</div>
-        <div class="port-info">
-          <div class="port-name">${info.d}</div>
-          <div class="port-ticker">${info.t || info.m}</div>
-        </div>
-        <div class="port-right">
-          <div class="port-pct">${h.pct.toFixed(2)}%</div>
-          <div class="port-krw">${fmt(h.valueKrw)}</div>
-          ${chgHtml}
-        </div>
+        <div class="port-info"><div class="port-name">${info.d}</div><div class="port-ticker">${info.t || info.m}</div></div>
+        <div class="port-right"><div class="port-pct">${h.pct.toFixed(2)}%</div><div class="port-krw">${fmt(h.valueKrw)}</div>${chgHtml}</div>
       </div>`;
-  }).join('');
-
-  // 국내 주식 (DART)
-  let krHtml = '';
-  if (krData?.holdings?.length) {
-    krHtml = `
-      <div style="padding:12px 14px 6px;font-size:11px;font-weight:700;color:#ADB5BD;letter-spacing:0.3px;margin-top:8px">국내 대량보유 (DART · 5% 이상)</div>
-      <div class="portfolio-list">
-        ${krData.holdings.map((h, i) => {
-          let chgHtml = '';
-          if (h.changeType === 'NEW') chgHtml = `<div class="port-chg new">신규</div>`;
-          else if (h.changeType === 'INCREASED') chgHtml = `<div class="port-chg up">▲ +${(h.changePct||0).toFixed(2)}%p</div>`;
-          else if (h.changeType === 'DECREASED') chgHtml = `<div class="port-chg dn">▼ ${Math.abs(h.changePct||0).toFixed(2)}%p</div>`;
-          const bg = h.changeType==='NEW'?'#DCFCE7':h.changeType==='INCREASED'?'#DBEAFE':h.changeType==='DECREASED'?'#FFF7ED':'#F2F4F6';
-          const tc = h.changeType==='NEW'?'#15803D':h.changeType==='INCREASED'?'#1E40AF':h.changeType==='DECREASED'?'#9A3412':'#4E5968';
-          return `
-          <div class="port-row" onclick="openKrStockSheet(${JSON.stringify(h)})">
-            <div class="port-rank">${i+1}</div>
-            <div class="port-icon" style="background:${bg};color:${tc}">${h.corp_name.charAt(0)}</div>
-            <div class="port-info">
-              <div class="port-name">${h.corp_name}</div>
-              <div class="port-ticker">코스피 · ${h.rcept_dt.slice(0,10).replace(/-/g,'.')} 공시</div>
-            </div>
-            <div class="port-right">
-              <div class="port-pct">${h.pct.toFixed(2)}%</div>
-              <div class="port-krw" style="color:#ADB5BD">회사 지분율</div>
-              ${chgHtml}
-            </div>
-          </div>`;
-        }).join('')}
-      </div>`;
-  } else if (!q) {
-    krHtml = `
-      <div style="padding:12px 14px 6px;font-size:11px;font-weight:700;color:#ADB5BD;letter-spacing:0.3px;margin-top:8px">국내 대량보유 (DART · 5% 이상)</div>
-      <div style="margin:0 12px 8px;background:#fff;border-radius:10px;padding:14px;text-align:center;font-size:12px;color:#ADB5BD">
-        국내 데이터 준비 중 (DART API 갱신 후 표시)
-      </div>`;
+    }).join('');
+    html += `<div style="padding:6px 14px 4px;font-size:11px;font-weight:700;color:#ADB5BD;margin-top:8px">🇺🇸 미국 주식 (SEC 13F)</div><div class="portfolio-list">${rows}</div>`;
   }
 
-  document.getElementById('portfolio-list').innerHTML =
-    `<div class="portfolio-list">${usHtml}</div>` + krHtml;
+  // ── 국내 주식 ──
+  if (marketFilter !== 'us') {
+    if (krData?.holdings?.length) {
+      let krList = [...krData.holdings];
+      if (q) krList = krList.filter(h => h.corp_name.toLowerCase().includes(q));
+      if (sortFilter === 'change') krList.sort((a,b) => Math.abs(b.changePct||0) - Math.abs(a.changePct||0));
+      const rows = krList.map((h,i) => {
+        const chgHtml = h.changeType==='NEW' ? `<div class="port-chg new">신규</div>`
+          : h.changeType==='INCREASED' ? `<div class="port-chg up">▲ +${(h.changePct||0).toFixed(2)}%p</div>`
+          : h.changeType==='DECREASED' ? `<div class="port-chg dn">▼ ${Math.abs(h.changePct||0).toFixed(2)}%p</div>` : '';
+        const bg = h.changeType==='NEW'?'#DCFCE7':h.changeType==='INCREASED'?'#DBEAFE':h.changeType==='DECREASED'?'#FFF7ED':'#F2F4F6';
+        const tc = h.changeType==='NEW'?'#15803D':h.changeType==='INCREASED'?'#1E40AF':h.changeType==='DECREASED'?'#9A3412':'#4E5968';
+        return `<div class="port-row" onclick="openKrStockSheet(${JSON.stringify(h)})">
+          <div class="port-rank">${i+1}</div>
+          <div class="port-icon" style="background:${bg};color:${tc}">${h.corp_name.charAt(0)}</div>
+          <div class="port-info"><div class="port-name">${h.corp_name}</div><div class="port-ticker">코스피 · ${h.rcept_dt.slice(0,10).replace(/-/g,'.')} 공시</div></div>
+          <div class="port-right"><div class="port-pct">${h.pct.toFixed(2)}%</div><div class="port-krw" style="color:#ADB5BD">회사 지분율</div>${chgHtml}</div>
+        </div>`;
+      }).join('');
+      html += `<div style="padding:6px 14px 4px;font-size:11px;font-weight:700;color:#ADB5BD;margin-top:8px">🇰🇷 국내 주식 (DART 5% 이상)</div><div class="portfolio-list">${rows}</div>`;
+    } else if (marketFilter === 'kr') {
+      html += `<div style="text-align:center;padding:40px 16px;font-size:13px;color:#ADB5BD">국내 데이터 준비 중</div>`;
+    }
+  }
+
+  el.innerHTML = html || `<div class="empty-state">검색 결과가 없어요</div>`;
 }
 
 // ── 섹터 탭 ───────────────────────────────────────────────────────
