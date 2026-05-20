@@ -174,7 +174,7 @@ async function fetchKoreanHoldings(dartKey) {
   const today  = new Date();
   const chunks = [];
 
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < 4; i++) {
     const end   = new Date(today);
     end.setMonth(end.getMonth() - i * 3);
     const start = new Date(end);
@@ -238,18 +238,32 @@ async function fetchKoreanHoldings(dartKey) {
 
         if (npsRows.length === 0) return;
 
-        const latest = npsRows[0];
-        const pct    = parseFloat(latest.stkrt || "0");
-        const shares = parseInt((latest.stkqy || "0").replace(/,/g, ""));
+        const current  = npsRows[0];
+        const previous = npsRows[1] || null;
+        const pct      = parseFloat(current.stkrt || "0");
+        const prevPct  = previous ? parseFloat(previous.stkrt || "0") : null;
+        const shares   = parseInt((current.stkqy || "0").replace(/,/g, ""));
+
+        let changeType, changePct;
+        if (prevPct === null) {
+          changeType = "NEW"; changePct = null;
+        } else if (pct > prevPct) {
+          changeType = "INCREASED"; changePct = +(pct - prevPct).toFixed(2);
+        } else if (pct < prevPct) {
+          changeType = "DECREASED"; changePct = +(pct - prevPct).toFixed(2);
+        } else {
+          changeType = "HOLD"; changePct = 0;
+        }
 
         if (pct >= 5) {
           holdings.push({
             corp_code,
             corp_name: info.corp_name,
-            shares,
-            pct,
-            rcept_dt: latest.rcept_dt,
-            market:   "KOSPI",
+            shares, pct, prevPct,
+            changeType, changePct,
+            rcept_dt: current.rcept_dt,
+            prevRcept_dt: previous?.rcept_dt || null,
+            market: "KOSPI",
           });
         }
       } catch (e) {

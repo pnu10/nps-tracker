@@ -201,7 +201,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI',
 .disclaimer { margin: 2px 12px 28px; background: #fff; border-radius: 10px; padding: 11px 14px; }
 .disclaimer p { font-size: 11px; color: #ADB5BD; line-height: 1.7; font-weight: 500; }
 .disclaimer strong { font-weight: 700; color: #8B95A1; }
+.disclaimer-invest { margin: 0 12px 6px; background: #FFF9EC; border-radius: 10px; padding: 10px 14px; }
+.disclaimer-invest p { font-size: 11px; color: #92400E; line-height: 1.6; font-weight: 600; }
 .empty-state { text-align: center; padding: 48px 16px; color: #ADB5BD; font-size: 14px; }
+.search-wrap { padding: 0 12px 8px; }
+.search-input { width: 100%; padding: 10px 14px; border: 1.5px solid #E8EAED; border-radius: 10px; font-size: 14px; font-family: inherit; color: #191F28; background: #fff; outline: none; box-sizing: border-box; }
+.search-input:focus { border-color: #191F28; }
+.sector-drill-list { padding: 0 20px; }
+.sector-drill-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #F8F9FA; }
+.sector-drill-row:last-child { border-bottom: none; }
+.sector-drill-name { font-size: 14px; font-weight: 700; color: #191F28; }
+.sector-drill-ticker { font-size: 11px; color: #ADB5BD; margin-top: 1px; }
+.sector-drill-right { text-align: right; }
+.sector-drill-pct { font-size: 14px; font-weight: 800; color: #191F28; }
+.sector-drill-chg { font-size: 11px; font-weight: 700; margin-top: 2px; }
 </style>
 </head>
 <body>
@@ -323,6 +336,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI',
     <button class="filter-btn"        data-filter="SOLD"      onclick="setChgFilter('SOLD',this)">🔴 청산</button>
   </div>
   <div id="changes-list"></div>
+  <div class="disclaimer-invest"><p>⚠️ 본 정보는 투자 권유가 아니며 참고용입니다. 투자 판단과 그 결과는 본인에게 있습니다.</p></div>
   <div class="disclaimer"><p>🇺🇸 SEC 13F 전종목 · 🇰🇷 DART 대량보유 공시 <strong>5% 이상</strong> · 직전 분기와 비교</p></div>
 </div>
 
@@ -337,7 +351,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI',
     <button class="sort-btn" onclick="setSortFilter('amount',this)">금액순</button>
     <button class="sort-btn" onclick="setSortFilter('change',this)">변화순</button>
   </div>
+  <div class="search-wrap">
+    <input class="search-input" id="portfolio-search" type="text" placeholder="종목명 검색..." oninput="renderPortfolio()">
+  </div>
   <div class="portfolio-list" id="portfolio-list"></div>
+  <div class="disclaimer-invest"><p>⚠️ 본 정보는 투자 권유가 아니며 참고용입니다. 투자 판단과 그 결과는 본인에게 있습니다.</p></div>
   <div class="disclaimer"><p>🇺🇸 SEC 13F 전종목 · 🇰🇷 DART <strong>5% 이상</strong> · 상위 50개 표시 · 직전 분기와 비교</p></div>
 </div>
 
@@ -345,7 +363,23 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI',
 <div id="tab-sector" class="tab-content">
   <div class="section-title" style="margin-top:10px">섹터별 보유 비중</div>
   <div class="sector-list" id="sector-list"></div>
+  <div class="disclaimer-invest"><p>⚠️ 본 정보는 투자 권유가 아니며 참고용입니다. 투자 판단과 그 결과는 본인에게 있습니다.</p></div>
   <div class="disclaimer"><p>섹터 분류는 참고용이며 실제 공시 기준과 다를 수 있습니다.</p></div>
+</div>
+
+<!-- 섹터 드릴다운 시트 -->
+<div class="overlay" id="sector-overlay" onclick="closeSectorSheet()" style="display:none"></div>
+<div class="sheet" id="sector-sheet">
+  <div class="sh-handle"></div>
+  <div class="sh-sticky">
+    <div class="sh-name" id="sector-sh-name">-</div>
+    <div class="sh-summary-row">
+      <span class="sh-summary-val" id="sector-sh-pct">-</span>
+      <span class="sh-summary-sep">·</span>
+      <span class="sh-summary-val" id="sector-sh-count">-</span>
+    </div>
+  </div>
+  <div id="sector-sh-content"></div>
 </div>
 
 <!-- 바텀시트 -->
@@ -674,11 +708,24 @@ function setChgFilter(f, btn) {
 
 function renderChanges() {
   if (!usData) return;
-  let list = [
-    ...usData.holdings.filter(h => h.changeType !== 'HOLD'),
-    ...(usData.sold||[]).map(h => ({...h, changeType:'SOLD', changePct:-100, pct:0, valueKrw:0})),
-  ];
-  if (chgFilter !== 'all') list = list.filter(h => h.changeType === chgFilter);
+  const sold = (usData.sold||[]).map(h => ({...h, changeType:'SOLD', changePct:-100, pct:0, valueKrw:0}));
+  const changed = usData.holdings.filter(h => h.changeType !== 'HOLD');
+
+  let list;
+  if (chgFilter === 'all') {
+    const newItems  = changed.filter(h => h.changeType === 'NEW').slice(0, 5);
+    const incItems  = changed.filter(h => h.changeType === 'INCREASED').sort((a,b) => (b.changePct||0)-(a.changePct||0)).slice(0, 8);
+    const decItems  = changed.filter(h => h.changeType === 'DECREASED').sort((a,b) => (a.changePct||0)-(b.changePct||0)).slice(0, 5);
+    const soldItems = sold.slice(0, 5);
+    list = [...newItems, ...incItems, ...decItems, ...soldItems];
+  } else if (chgFilter === 'SOLD') {
+    list = sold;
+  } else {
+    list = changed.filter(h => h.changeType === chgFilter);
+    if (chgFilter === 'INCREASED') list.sort((a,b) => (b.changePct||0)-(a.changePct||0));
+    if (chgFilter === 'DECREASED') list.sort((a,b) => (a.changePct||0)-(b.changePct||0));
+    list = list.slice(0, 20);
+  }
 
   const el = document.getElementById('changes-list');
   if (!list.length) { el.innerHTML = `<div class="empty-state">해당 유형의 변화가 없어요</div>`; return; }
@@ -716,13 +763,18 @@ function setSortFilter(f, btn) {
 }
 
 function renderPortfolio() {
-  if (!usData) return;
+  if (!usData && !krData) return;
+  const q = (document.getElementById('portfolio-search')?.value || '').toLowerCase();
   let data = [...usData.holdings];
+  if (q) data = data.filter(h => {
+    const info = lookup(h.name);
+    return info.d.toLowerCase().includes(q) || (info.t||'').toLowerCase().includes(q);
+  });
   if (sortFilter === 'amount') data.sort((a,b) => b.valueKrw - a.valueKrw);
   else if (sortFilter === 'change') data.sort((a,b) => Math.abs(b.changePct||0) - Math.abs(a.changePct||0));
   data = data.slice(0,50);
 
-  document.getElementById('portfolio-list').innerHTML = data.map((h,i) => {
+  const usHtml = data.map((h,i) => {
     const info = lookup(h.name);
     let chgHtml = '';
     if (h.changeType==='NEW') chgHtml = `<div class="port-chg new">신규</div>`;
@@ -745,24 +797,74 @@ function renderPortfolio() {
         </div>
       </div>`;
   }).join('');
+
+  // 국내 주식 (DART)
+  let krHtml = '';
+  if (krData?.holdings?.length) {
+    krHtml = `
+      <div style="padding:12px 14px 6px;font-size:11px;font-weight:700;color:#ADB5BD;letter-spacing:0.3px;margin-top:8px">국내 대량보유 (DART · 5% 이상)</div>
+      <div class="portfolio-list">
+        ${krData.holdings.map((h, i) => {
+          let chgHtml = '';
+          if (h.changeType === 'NEW') chgHtml = `<div class="port-chg new">신규</div>`;
+          else if (h.changeType === 'INCREASED') chgHtml = `<div class="port-chg up">▲ +${(h.changePct||0).toFixed(2)}%p</div>`;
+          else if (h.changeType === 'DECREASED') chgHtml = `<div class="port-chg dn">▼ ${Math.abs(h.changePct||0).toFixed(2)}%p</div>`;
+          const bg = h.changeType==='NEW'?'#DCFCE7':h.changeType==='INCREASED'?'#DBEAFE':h.changeType==='DECREASED'?'#FFF7ED':'#F2F4F6';
+          const tc = h.changeType==='NEW'?'#15803D':h.changeType==='INCREASED'?'#1E40AF':h.changeType==='DECREASED'?'#9A3412':'#4E5968';
+          return `
+          <div class="port-row" onclick="openKrStockSheet(${JSON.stringify(h)})">
+            <div class="port-rank">${i+1}</div>
+            <div class="port-icon" style="background:${bg};color:${tc}">${h.corp_name.charAt(0)}</div>
+            <div class="port-info">
+              <div class="port-name">${h.corp_name}</div>
+              <div class="port-ticker">코스피 · ${h.rcept_dt.slice(0,10).replace(/-/g,'.')} 공시</div>
+            </div>
+            <div class="port-right">
+              <div class="port-pct">${h.pct.toFixed(2)}%</div>
+              <div class="port-krw" style="color:#ADB5BD">회사 지분율</div>
+              ${chgHtml}
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`;
+  } else if (!q) {
+    krHtml = `
+      <div style="padding:12px 14px 6px;font-size:11px;font-weight:700;color:#ADB5BD;letter-spacing:0.3px;margin-top:8px">국내 대량보유 (DART · 5% 이상)</div>
+      <div style="margin:0 12px 8px;background:#fff;border-radius:10px;padding:14px;text-align:center;font-size:12px;color:#ADB5BD">
+        국내 데이터 준비 중 (DART API 갱신 후 표시)
+      </div>`;
+  }
+
+  document.getElementById('portfolio-list').innerHTML =
+    `<div class="portfolio-list">${usHtml}</div>` + krHtml;
 }
 
 // ── 섹터 탭 ───────────────────────────────────────────────────────
+function buildSectorMap() {
+  const map = {};
+  for (const h of (usData?.holdings || [])) {
+    const info = lookup(h.name);
+    const s = info.s || '기타';
+    if (!map[s]) map[s] = { pct:0, holdings:[] };
+    map[s].pct += h.pct;
+    map[s].holdings.push({ ...h, info });
+  }
+  return map;
+}
+
 function renderSectors() {
   if (!usData) return;
-  const sectorMap = {};
-  for (const h of usData.holdings) {
-    const s = lookup(h.name).s || '기타';
-    if (!sectorMap[s]) sectorMap[s] = { pct:0, stocks:[] };
-    sectorMap[s].pct += h.pct;
-    if (sectorMap[s].stocks.length < 5) sectorMap[s].stocks.push(lookup(h.name).d);
-  }
+  const sectorMap = buildSectorMap();
   const sectors = Object.entries(sectorMap)
-    .map(([name, data]) => ({ name, pct:+data.pct.toFixed(1), stocks:data.stocks, ...(SECTOR_META[name]||{icon:'📊',tint:'#F8F9FA'}) }))
+    .map(([name, data]) => ({
+      name, pct:+data.pct.toFixed(1),
+      stocks: data.holdings.slice(0,5).map(h => h.info.d),
+      ...(SECTOR_META[name]||{icon:'📊',tint:'#F8F9FA'})
+    }))
     .sort((a,b) => b.pct-a.pct).slice(0,10);
   const maxPct = sectors[0]?.pct || 1;
   document.getElementById('sector-list').innerHTML = sectors.map(s => `
-    <div class="sector-card">
+    <div class="sector-card" onclick="openSectorSheet(${JSON.stringify(s.name)})">
       <div class="sector-top">
         <div style="display:flex;align-items:center;gap:10px">
           <div class="sector-icon-wrap" style="background:${s.tint}">${s.icon}</div>
@@ -770,12 +872,52 @@ function renderSectors() {
         </div>
         <div class="sector-right">
           <div class="sector-pct">${s.pct}%</div>
-          <div class="sector-pct-label">포트 비중</div>
+          <div class="sector-pct-label">포트 비중 · 탭하면 종목 보기</div>
         </div>
       </div>
       <div class="sector-bar-bg"><div class="sector-bar" style="width:${(s.pct/maxPct*100).toFixed(0)}%"></div></div>
       <div class="sector-chips">${s.stocks.map(st => `<span class="sector-chip">${st}</span>`).join('')}</div>
     </div>`).join('');
+}
+
+function openSectorSheet(sectorName) {
+  if (!usData) return;
+  const sectorMap = buildSectorMap();
+  const data = sectorMap[sectorName];
+  if (!data) return;
+  const meta = SECTOR_META[sectorName] || { icon:'📊', tint:'#F8F9FA' };
+  const holdings = data.holdings.sort((a,b) => b.pct - a.pct);
+
+  document.getElementById('sector-sh-name').textContent = `${meta.icon} ${sectorName}`;
+  document.getElementById('sector-sh-pct').textContent = `${data.pct.toFixed(1)}% 비중`;
+  document.getElementById('sector-sh-count').textContent = `${holdings.length}개 종목`;
+
+  document.getElementById('sector-sh-content').innerHTML = `
+    <div class="sector-drill-list">
+      ${holdings.map(h => {
+        const chgColor = h.changeType==='INCREASED'?'#0BB25F':h.changeType==='DECREASED'?'#DC2626':h.changeType==='NEW'?'#6D28D9':'#ADB5BD';
+        const chgLabel = h.changeType==='NEW'?'신규':h.changeType==='INCREASED'?`+${(h.changePct||0).toFixed(1)}%`:h.changeType==='DECREASED'?`${(h.changePct||0).toFixed(1)}%`:'-';
+        return `
+          <div class="sector-drill-row">
+            <div>
+              <div class="sector-drill-name">${h.info.d}</div>
+              <div class="sector-drill-ticker">${h.info.t || h.info.m}</div>
+            </div>
+            <div class="sector-drill-right">
+              <div class="sector-drill-pct">${h.pct.toFixed(2)}%</div>
+              <div class="sector-drill-chg" style="color:${chgColor}">${chgLabel}</div>
+            </div>
+          </div>`;
+      }).join('')}
+    </div>`;
+
+  document.getElementById('sector-overlay').style.display = 'block';
+  setTimeout(() => document.getElementById('sector-sheet').classList.add('open'), 10);
+}
+
+function closeSectorSheet() {
+  document.getElementById('sector-sheet').classList.remove('open');
+  document.getElementById('sector-overlay').style.display = 'none';
 }
 
 // ── 바텀시트 ──────────────────────────────────────────────────────
@@ -818,15 +960,55 @@ function closeSheet() {
   document.getElementById('overlay').style.display = 'none';
 }
 
+function openKrStockSheet(h) {
+  const t = TYPE_META[h.changeType] || TYPE_META['HOLD'];
+  curStock = { ...h, market: 'KR' };
+  document.getElementById('sh-name').textContent = h.corp_name;
+  document.getElementById('sh-weight').textContent = `${h.pct.toFixed(2)}% 지분율`;
+  document.getElementById('sh-krw').textContent = `${h.shares.toLocaleString()}주`;
+  const badge = document.getElementById('sh-badge');
+  badge.textContent = t.label; badge.style.background = t.badgeBg; badge.style.color = t.badgeTc;
+  const dtFmt = d => d ? d.slice(0,10).replace(/-/g,'.') : '-';
+  let html = `<div class="sh-section"><div class="sh-section-title">현재 보유</div><div class="sh-stat-row">
+    <div class="sh-stat"><div class="sh-stat-val">${h.pct.toFixed(2)}%</div><div class="sh-stat-label">회사 지분율</div></div>
+    <div class="sh-stat"><div class="sh-stat-val">${h.shares.toLocaleString()}</div><div class="sh-stat-label">보유 주수</div></div>
+  </div></div>`;
+  html += `<div class="sh-section"><div class="sh-section-title">직전 공시 대비 변화</div>
+    <div class="sh-change-row"><div class="sh-change-label">변화 유형</div><div class="sh-change-val" style="color:${t.badgeTc}">${t.label}</div></div>
+    ${h.prevPct !== null && h.prevPct !== undefined ? `<div class="sh-change-row"><div class="sh-change-label">전 지분율</div><div class="sh-change-val">${h.prevPct.toFixed(2)}%</div></div>` : ''}
+    ${h.changePct !== null && h.changePct !== undefined && h.changePct !== 0 ? `<div class="sh-change-row"><div class="sh-change-label">변화</div><div class="sh-change-val" style="color:${h.changePct>0?'#0BB25F':'#DC2626'}">${h.changePct>0?'+':''}${h.changePct.toFixed(2)}%p</div></div>` : ''}
+    <div class="sh-change-row"><div class="sh-change-label">데이터 출처</div><div class="sh-change-val" style="color:#6B7280">DART 대량보유</div></div>
+  </div>`;
+  html += `<div class="sh-section"><div class="sh-section-title">공시 정보</div>
+    <div class="sh-change-row"><div class="sh-change-label">최신 공시일</div><div class="sh-change-val">${dtFmt(h.rcept_dt)}</div></div>
+    ${h.prevRcept_dt ? `<div class="sh-change-row"><div class="sh-change-label">이전 공시일</div><div class="sh-change-val">${dtFmt(h.prevRcept_dt)}</div></div>` : ''}
+    <div class="sh-change-row"><div class="sh-change-label">시장</div><div class="sh-change-val">코스피 (KOSPI)</div></div>
+  </div>`;
+  document.getElementById('sh-content').innerHTML = html;
+  document.getElementById('overlay').style.display = 'block';
+  setTimeout(() => document.getElementById('stock-sheet').classList.add('open'), 10);
+}
+
 function shareStock() {
   if (!curStock) return;
+  if (curStock.market === 'KR') {
+    const t = TYPE_META[curStock.changeType] || TYPE_META['HOLD'];
+    const lines = [
+      `국민연금 ${curStock.corp_name} ${curStock.pct.toFixed(2)}% 보유`, ``,
+      t.label !== '유지' ? `직전 공시 대비 ${t.label}` : '',
+      curStock.changePct ? `${curStock.changePct>0?'+':''}${curStock.changePct.toFixed(2)}%p` : '',
+      ``, `국민연금 뭐샀지 📊\nhttps://pnu10.github.io/nps-tracker/`,
+    ].filter(Boolean).join('\n');
+    shareText(`국민연금 ${curStock.corp_name} 보유 현황`, lines);
+    return;
+  }
   const t = TYPE_META[curStock.type];
   const lines = [
     `국민연금이 이번 분기 ${t.label}한 종목`, ``,
     `${curStock.name}${curStock.ticker ? ` (${curStock.ticker})` : ''}`,
     curStock.type !== 'SOLD' ? `보유 비중 ${curStock.weight.toFixed(2)}% · ${fmt(curStock.krw)}` : '이번 분기 전량 매도',
     curStock.changePct && curStock.changePct !== 0 ? `직전 분기 대비 ${curStock.changePct>0?'+':''}${curStock.changePct.toFixed(1)}%` : '',
-    ``, `국민연금 뭐샀지 📊`,
+    ``, `국민연금 뭐샀지 📊\nhttps://pnu10.github.io/nps-tracker/`,
   ].filter(Boolean).join('\n');
   shareText(`국민연금 ${curStock.name} 보유 현황`, lines);
 }
