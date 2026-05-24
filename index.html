@@ -3,7 +3,49 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>국민연금픽</title>
+<title>국민연금 포트폴리오 조회 · 따라사기 분석 — 국민연금픽</title>
+<meta name="description" content="국민연금 포트폴리오를 한눈에 확인하고 따라사기 분석까지. 국민연금이 담은 국내외 주식, 신규 편입 종목, 비중 변화를 분기별로 제공합니다.">
+<meta name="keywords" content="국민연금 포트폴리오, 국민연금 따라사기, 국민연금 포트폴리오 따라사기, 국민연금 보유종목, 국민연금 주식, 국민연금 매매, 국민연금 공시, NPS 포트폴리오, 국민연금픽">
+<meta name="author" content="국민연금픽">
+<link rel="canonical" href="https://npspick.com">
+
+<!-- Open Graph (카카오, 페북, 슬랙 등 링크 미리보기) -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://npspick.com">
+<meta property="og:title" content="국민연금 포트폴리오 조회 · 따라사기 분석 — 국민연금픽">
+<meta property="og:description" content="국민연금 포트폴리오를 한눈에 확인하고 따라사기 분석까지. 국민연금이 담은 국내외 주식, 신규 편입 종목, 비중 변화를 분기별로 제공합니다.">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:image" content="https://npspick.com/thumbnail.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="국민연금 포트폴리오 조회 · 따라사기 분석 — 국민연금픽">
+<meta name="twitter:description" content="국민연금 포트폴리오를 한눈에 확인하고 따라사기 분석까지. 국민연금이 담은 국내외 주식, 신규 편입 종목, 비중 변화를 분기별로 제공합니다.">
+<meta name="twitter:image" content="https://npspick.com/thumbnail.png">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "국민연금픽",
+  "url": "https://npspick.com",
+  "description": "국민연금 포트폴리오를 한눈에 확인하고 따라사기 분석까지. 국민연금이 담은 국내외 주식, 신규 편입 종목, 비중 변화를 분기별로 제공합니다.",
+  "applicationCategory": "FinanceApplication",
+  "inLanguage": "ko-KR",
+  "keywords": "국민연금 포트폴리오, 국민연금 따라사기, 국민연금 보유종목, NPS 포트폴리오"
+}
+</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-NVDMLGXHLY"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-NVDMLGXHLY');
+</script>
+
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI', sans-serif; background: #F2F4F6; color: #191F28; min-height: 100vh; }
@@ -320,6 +362,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI',
   <div class="disclaimer-invest"><p>⚠️ 본 정보는 투자 권유가 아닙니다. 공시 지표를 기반으로 한 참고용 자료이며, 투자 판단과 그 결과는 본인에게 있습니다.</p></div>
   <div class="disclaimer">
     <p>🇺🇸 미국은 SEC 13F 전종목 · 🇰🇷 국내는 DART 대량보유 공시 기준 <strong>5% 이상 종목만</strong> 표시 · 직전 분기와 비교</p>
+    <p>본 자료는 국민연금기금운용본부 및 SEC EDGAR 공개자료를 바탕으로 재구성한 비공식 분석 자료이며, 국민연금공단의 공식 자료가 아닙니다.</p>
   </div>
 </div>
 
@@ -340,7 +383,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI',
   </div>
   <div id="changes-list"></div>
   <div class="disclaimer-invest"><p>⚠️ 본 정보는 투자 권유가 아니며 참고용입니다. 투자 판단과 그 결과는 본인에게 있습니다.</p></div>
-  <div class="disclaimer"><p>🇺🇸 SEC 13F 전종목 · 🇰🇷 DART 대량보유 공시 <strong>5% 이상</strong> · 직전 분기와 비교</p></div>
+  <div class="disclaimer">
+    <p>🇺🇸 SEC 13F 전종목 · 🇰🇷 DART 대량보유 공시 <strong>5% 이상</strong> · 직전 분기와 비교</p>
+    <p>본 자료는 국민연금기금운용본부 및 SEC EDGAR 공개자료를 바탕으로 재구성한 비공식 분석 자료이며, 국민연금공단의 공식 자료가 아닙니다.</p>
+  </div>
 </div>
 
 <!-- 포트폴리오 탭 -->
@@ -364,7 +410,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI',
   </div>
   <div class="portfolio-list" id="portfolio-list"></div>
   <div class="disclaimer-invest"><p>⚠️ 본 정보는 투자 권유가 아니며 참고용입니다. 투자 판단과 그 결과는 본인에게 있습니다.</p></div>
-  <div class="disclaimer"><p>🇺🇸 SEC 13F 전종목 · 🇰🇷 DART <strong>5% 이상</strong> · 상위 50개 표시 · 직전 분기와 비교</p></div>
+  <div class="disclaimer">
+    <p>🇺🇸 SEC 13F 전종목 · 🇰🇷 DART <strong>5% 이상</strong> · 상위 50개 표시 · 직전 분기와 비교</p>
+    <p>본 자료는 국민연금기금운용본부 및 SEC EDGAR 공개자료를 바탕으로 재구성한 비공식 분석 자료이며, 국민연금공단의 공식 자료가 아닙니다.</p>
+  </div>
 </div>
 
 <!-- 섹터 탭 -->
@@ -372,7 +421,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI',
   <div class="section-title" style="margin-top:10px">섹터별 보유 비중</div>
   <div class="sector-list" id="sector-list"></div>
   <div class="disclaimer-invest"><p>⚠️ 본 정보는 투자 권유가 아니며 참고용입니다. 투자 판단과 그 결과는 본인에게 있습니다.</p></div>
-  <div class="disclaimer"><p>섹터 분류는 참고용이며 실제 공시 기준과 다를 수 있습니다.</p></div>
+  <div class="disclaimer">
+    <p>섹터 분류는 참고용이며 실제 공시 기준과 다를 수 있습니다.</p>
+    <p>본 자료는 국민연금기금운용본부 및 SEC EDGAR 공개자료를 바탕으로 재구성한 비공식 분석 자료이며, 국민연금공단의 공식 자료가 아닙니다.</p>
+  </div>
 </div>
 
 <!-- 섹터 드릴다운 시트 -->
@@ -572,12 +624,16 @@ function toast(msg) {
 }
 
 function shareText(title, text) {
+  if (window.parent !== window) {
+    window.parent.postMessage({ type: 'share', title, text }, '*');
+    return;
+  }
   if (navigator.share) { navigator.share({ title, text }).catch(()=>{}); }
   else if (navigator.clipboard) { navigator.clipboard.writeText(text).then(() => toast('복사됐어요 📋')); }
 }
 
 function shareApp() {
-  shareText('국민연금픽', `국민연금 포트폴리오 생각보다 재밌네\n\n국민연금 공시 기반 포트폴리오 탐색 📊\n국민연금픽\nhttps://pnu10.github.io/nps-tracker/`);
+  shareText('국민연금픽', `국민연금이 뭘 샀는지 궁금하다면 👀\n\n공시 기반 포트폴리오 탐색 📊\nhttps://npspick.com`);
 }
 
 // ── 데이터 로딩 ───────────────────────────────────────────────────
@@ -1004,7 +1060,7 @@ function shareStock() {
       `국민연금 ${curStock.corp_name} ${curStock.pct.toFixed(2)}% 보유`, ``,
       t.label !== '유지' ? `직전 공시 대비 ${t.label}` : '',
       curStock.changePct ? `${curStock.changePct>0?'+':''}${curStock.changePct.toFixed(2)}%p` : '',
-      ``, `국민연금픽 📊\nhttps://pnu10.github.io/nps-tracker/`,
+      ``, `국민연금픽 📊\nhttps://npspick.com`,
     ].filter(Boolean).join('\n');
     shareText(`국민연금 ${curStock.corp_name} 보유 현황`, lines);
     return;
@@ -1015,7 +1071,7 @@ function shareStock() {
     `${curStock.name}${curStock.ticker ? ` (${curStock.ticker})` : ''}`,
     curStock.type !== 'SOLD' ? `보유 비중 ${curStock.weight.toFixed(2)}% · ${fmt(curStock.krw)}` : '이번 분기 전량 매도',
     curStock.changePct && curStock.changePct !== 0 ? `직전 분기 대비 ${curStock.changePct>0?'+':''}${curStock.changePct.toFixed(1)}%` : '',
-    ``, `국민연금픽 📊\nhttps://pnu10.github.io/nps-tracker/`,
+    ``, `국민연금픽 📊\nhttps://npspick.com`,
   ].filter(Boolean).join('\n');
   shareText(`국민연금 ${curStock.name} 보유 현황`, lines);
 }
@@ -1027,5 +1083,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 </script>
+
+<!-- 구글 크롤러용 SSR 데이터 — JS 로드 후 숨김 -->
+<div id="ssr-holdings"></div>
+<script>document.getElementById('ssr-holdings').style.display='none';</script>
 </body>
 </html>

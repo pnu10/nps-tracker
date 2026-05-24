@@ -1,6 +1,10 @@
 name = "nps-tracker"
 main = "worker/index.js"
-compatibility_date = "2024-01-01"
+compatibility_date = "2024-09-23"
+
+[assets]
+directory = "."
+binding = "ASSETS"
 
 # KV 네임스페이스 — 배포 후 아래 id 채우기
 [[kv_namespaces]]

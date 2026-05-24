@@ -388,6 +388,31 @@ export default {
       }
     }
 
+    // robots.txt
+    if (path === "/robots.txt") {
+      return new Response(
+        `User-agent: *\nAllow: /\nSitemap: https://npspick.com/sitemap.xml\n`,
+        { headers: { "Content-Type": "text/plain" } }
+      );
+    }
+
+    // sitemap.xml
+    if (path === "/sitemap.xml") {
+      const today = new Date().toISOString().slice(0, 10);
+      return new Response(
+        `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://npspick.com/</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>`,
+        { headers: { "Content-Type": "application/xml" } }
+      );
+    }
+
     // 수동 갱신 트리거 (배포 후 첫 데이터 채우기용)
     if (path === "/api/refresh" && request.method === "POST") {
       ctx.waitUntil((async () => {
@@ -411,7 +436,40 @@ export default {
       return json({ message: "갱신 시작됨 (백그라운드)" });
     }
 
-    return json({ error: "Not Found" }, 404);
+    // HTML 서빙 + SSR 데이터 주입
+    const assetRes = await env.ASSETS.fetch(request);
+    if (!assetRes.ok || !assetRes.headers.get("content-type")?.includes("text/html")) {
+      return assetRes;
+    }
+
+    const [usRaw, krRaw] = await Promise.all([
+      env.KV.get("us_holdings"),
+      env.KV.get("kr_holdings"),
+    ]);
+
+    const us = usRaw ? JSON.parse(usRaw) : null;
+    const kr = krRaw ? JSON.parse(krRaw) : null;
+    if (!us && !kr) return assetRes;
+
+    const usRows = (us?.holdings || []).slice(0, 10).map((h, i) =>
+      `<li>${i + 1}. ${h.name} — ${h.pct}% (약 ${Math.round(h.valueKrw / 1e8).toLocaleString()}억원)</li>`
+    ).join("");
+
+    const krRows = (kr?.holdings || []).slice(0, 10).map((h, i) =>
+      `<li>${i + 1}. ${h.corp_name} — ${h.pct.toFixed(2)}%</li>`
+    ).join("");
+
+    const ssrHtml = `
+      <section style="padding:16px 12px">
+        <h2 style="font-size:13px;font-weight:700;color:#4E5968;margin-bottom:8px">🇺🇸 국민연금 미국 보유종목 포트폴리오 (상위 10개)</h2>
+        <ul style="font-size:12px;color:#6B7280;line-height:2;list-style:none;padding:0">${usRows}</ul>
+        <h2 style="font-size:13px;font-weight:700;color:#4E5968;margin:12px 0 8px">🇰🇷 국민연금 국내 보유종목 포트폴리오</h2>
+        <ul style="font-size:12px;color:#6B7280;line-height:2;list-style:none;padding:0">${krRows}</ul>
+      </section>`;
+
+    return new HTMLRewriter()
+      .on("#ssr-holdings", { element(el) { el.setInnerContent(ssrHtml, { html: true }); } })
+      .transform(assetRes);
   },
 
   scheduled,
